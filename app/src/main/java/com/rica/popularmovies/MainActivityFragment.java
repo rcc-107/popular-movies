@@ -112,7 +112,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String sort = sp.getString(getString(R.string.pref_sort_key),getString(R.string.popularity));
+        String sort = sp.getString(getString(R.string.pref_sort_key),getString(R.string.popularity))+" Desc";
         Uri moviesUri;
 
         if(getString(R.string.popularity)==sort) {
