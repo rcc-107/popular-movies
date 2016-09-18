@@ -22,11 +22,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         LinearLayout root;
         ImageView imageView;
         TextView textView;
+        TextView textView2;
         public ViewHolder(View itemView) {
             super(itemView);
             root = (LinearLayout) itemView;
             imageView = (ImageView) root.findViewById(R.id.imageView);
             textView = (TextView) root.findViewById(R.id.text);
+            textView2 = (TextView) root.findViewById(R.id.text2);
         }
     }
 
@@ -45,7 +47,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(ViewHolder holder, int position) {
         if(cursor.moveToPosition(position)){
             Utility.setPoster(context,cursor.getString(MainActivityFragment.POSTER_PATH),holder.imageView);
-//            holder.textView.setText(cursor.getString(MainActivityFragment.TITLE));
+            holder.textView.setText(cursor.getString(MainActivityFragment.VOTE_AVERAGE));
+            holder.textView2.setText(cursor.getString(MainActivityFragment.POPULARITY));
         }
     }
 

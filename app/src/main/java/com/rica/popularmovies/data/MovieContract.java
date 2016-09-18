@@ -25,6 +25,7 @@ public class MovieContract {
         public static final String MOVIE_ID = "movie_id";
         public static final String TITLE = "title";
         public static final String RELEASE_DATE = "release_date";
+        public static final String POPULARITY = "popularity";
         public static final String VOTE_AVERAGE = "vote_average";
         public static final String SYNOPSIS = "synopsis";
         public static final String POSTER_PATH = "poster_path";
@@ -35,9 +36,17 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI,id);
         }
 
-        ///// content://com.rica.popularmovies/movies/date/10920898
+        /////sort by date added to database content://com.rica.popularmovies/movies/date/10920898
         public static Uri buildMovieUriWithStartDate(long date){
-            return CONTENT_URI.buildUpon().appendPath(Long.toString(Utility.normalizeDate(date))).build();
+            return CONTENT_URI.buildUpon().appendPath("date").appendPath(Long.toString(Utility.normalizeDate(date))).build();
+        }
+
+        public static Uri buildMovieUriSortByPopularity(){
+            return CONTENT_URI.buildUpon().appendPath(POPULARITY).build();
+        }
+
+        public static Uri buildMovieUriSortByVote() {
+            return CONTENT_URI.buildUpon().appendPath(VOTE_AVERAGE).build();
         }
     }
 

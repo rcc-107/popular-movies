@@ -18,9 +18,11 @@ public class MovieProvider extends ContentProvider {
     private MovieDBHelper movieDBHelper;
     private static final UriMatcher mUriMatcher = buildUriMatcher();
 
-    private static final int MOVIES = 100;
-    private static final int MOVIE_WITH_ID = 101;
-    private static final int MOVIE_WITH_START_DATE = 102;
+    private static final int MOVIE_SORT_POPULARITY = 100;
+    private static final int MOVIE_SORT_VOTE = 101;
+    private static final int MOVIES = 102;
+    private static final int MOVIE_WITH_ID = 103;
+
 
     @Override
     public boolean onCreate() {
@@ -35,14 +37,18 @@ public class MovieProvider extends ContentProvider {
         SQLiteDatabase db = movieDBHelper.getReadableDatabase();
         final int matcher = mUriMatcher.match(uri);
         switch(matcher){
-            case MOVIE_WITH_START_DATE:
+            case MOVIE_SORT_POPULARITY:
                 returnCursor = db.query(MovieContract.MovieEntry.TABLE_NAME,
                         projection,selection,selectArgs,null,null,sort);
                 break;
-            case MOVIE_WITH_ID:
+            case MOVIE_SORT_VOTE:
                 returnCursor = db.query(MovieContract.MovieEntry.TABLE_NAME,
                         projection,selection,selectArgs,null,null,sort);
                 break;
+            /*case MOVIE_WITH_ID:
+                returnCursor = db.query(MovieContract.MovieEntry.TABLE_NAME,
+                        projection,selection,selectArgs,null,null,sort);
+                break;*/
             default:
                 throw new UnsupportedOperationException("Unknown Uri: "+uri);
         }
@@ -128,9 +134,11 @@ public class MovieProvider extends ContentProvider {
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieContract.CONTENT_AUTHORITY;
+        matcher.addURI(authority, MovieContract.PATH_MOVIES+"/popularity",MOVIE_SORT_POPULARITY);
+        matcher.addURI(authority, MovieContract.PATH_MOVIES+"/vote_average",MOVIE_SORT_VOTE);
         matcher.addURI(authority, MovieContract.PATH_MOVIES,MOVIES);
         matcher.addURI(authority, MovieContract.PATH_MOVIES+"/*",MOVIE_WITH_ID);
-        matcher.addURI(authority, MovieContract.PATH_MOVIES+"/date/*",MOVIE_WITH_START_DATE);
+
         return matcher;
     }
 

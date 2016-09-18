@@ -3,6 +3,8 @@ package com.rica.popularmovies;
 import android.content.Context;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
@@ -24,8 +26,20 @@ public class Utility {
         return gregorianCalendar.getTimeInMillis();
     }
 
-    public static void setPoster(Context context, String relativePath, ImageView img){
-        String url = "http://image.tmdb.org/t/p/w185"+relativePath;
-        Picasso.with(context).load(url).into(img);
+    public static void setPoster(final Context context, String relativePath, final ImageView img){
+        final String url = "http://image.tmdb.org/t/p/w185"+relativePath;
+        Picasso picasso = Picasso.with(context);
+        picasso.setIndicatorsEnabled(true);
+        picasso.load(url).networkPolicy(NetworkPolicy.OFFLINE).into(img, new Callback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError() {
+                Picasso.with(context).load(url).placeholder(R.drawable.poster_placeholder).into(img);
+            }
+        });
     }
 }

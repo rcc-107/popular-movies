@@ -7,10 +7,8 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -69,12 +67,12 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private static void onAccountCreated(Account account, Context context) {
-        configurePeriodicSync(context,SYNC_INTERVAL,SYNC_FLEXTIME);
-        ContentResolver.setSyncAutomatically(account,context.getString(R.string.authority),true);
+//        configurePeriodicSync(context,SYNC_INTERVAL,SYNC_FLEXTIME);
+        ContentResolver.setSyncAutomatically(account,context.getString(R.string.authority),false);
         syncImmediately(context);
     }
 
-    private static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
+ /*   private static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
         Account account = getSyncAccount(context);
         String authority = context.getString(R.string.authority);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
@@ -85,7 +83,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         }else{
             ContentResolver.addPeriodicSync(account,authority,new Bundle(),syncInterval);
         }
-    }
+    }*/
 
     @Override
     public void onPerformSync(Account account, Bundle bundle, String s, ContentProviderClient contentProviderClient, SyncResult syncResult) {
@@ -96,7 +94,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
             final String BASE_URL = "https://api.themoviedb.org/3/discover/movie";
 
             Uri uri = Uri.parse(BASE_URL).buildUpon()
-                    .appendQueryParameter(SORTBY, mContext.getString(R.string.popularity_desc))
+                    .appendQueryParameter(SORTBY, mContext.getString(R.string.release_date))
                     .appendQueryParameter("api_key","62e177741ae6467e6af95e2c21d57c6e").build();
 
             URL url = new URL(uri.toString());
@@ -143,6 +141,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         final String TMDB_MOVIE_ID = "id";
         final String TMDB_ORIGINAL_LANGUAGE = "original_language";
         final String TMDB_TITLE = "title";
+        final String TMDB_POPULARITY = "popularity";
         final String TMDB_VOTE_AVERAGE = "vote_average";
         final String TMDB_POSTER_PATH = "poster_path";
         //for debugging
@@ -159,6 +158,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 String release_date = resultsJO.getString(TMDB_RELEASE_DATE);
                 int movie_id = resultsJO.getInt(TMDB_MOVIE_ID);
                 String title = resultsJO.getString(TMDB_TITLE);
+                Double popularity = resultsJO.getDouble(TMDB_POPULARITY);
                 Double vote_average = resultsJO.getDouble(TMDB_VOTE_AVERAGE);
                 String poster = resultsJO.getString(TMDB_POSTER_PATH);
                 long date_today = Utility.normalizeDate(System.currentTimeMillis());
@@ -168,6 +168,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 movieValues.put(MovieContract.MovieEntry.RELEASE_DATE,release_date);
                 movieValues.put(MovieContract.MovieEntry.SYNOPSIS,overview);
                 movieValues.put(MovieContract.MovieEntry.TITLE,title);
+                movieValues.put(MovieContract.MovieEntry.POPULARITY,popularity);
                 movieValues.put(MovieContract.MovieEntry.VOTE_AVERAGE,vote_average);
                 movieValues.put(MovieContract.MovieEntry.POSTER_PATH,poster);
                 movieValues.put(MovieContract.MovieEntry.DATE_ADDED,date_today);
