@@ -29,6 +29,7 @@ public class MovieContract {
         public static final String VOTE_AVERAGE = "vote_average";
         public static final String SYNOPSIS = "synopsis";
         public static final String POSTER_PATH = "poster_path";
+        public static final String BACKDROP_PATH = "backdrop_path";
         public static final String DATE_ADDED = "date_added";
 
         ///// content://com.rica.popularmovies/movies/10900908
@@ -47,6 +48,10 @@ public class MovieContract {
 
         public static Uri buildMovieUriSortByVote() {
             return CONTENT_URI.buildUpon().appendPath(VOTE_AVERAGE).build();
+        }
+
+        public static Uri buildMovieUriWithMovieID(int movieID) {
+            return CONTENT_URI.buildUpon().appendPath(Integer.toString(movieID)).build();
         }
     }
 

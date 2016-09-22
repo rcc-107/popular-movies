@@ -1,6 +1,7 @@
 package com.rica.popularmovies;
 
 import android.content.Context;
+import android.net.Uri;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Callback;
@@ -17,7 +18,7 @@ import java.util.TimeZone;
  */
 public class Utility {
 
-    public static long normalizeDate(long dateInMili){
+    public static long normalizeDate(long dateInMili) {
         GregorianCalendar gregorianCalendar = (GregorianCalendar) Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         gregorianCalendar.setTime(new Date(dateInMili));
         gregorianCalendar.add(Calendar.HOUR, 0);
@@ -26,7 +27,7 @@ public class Utility {
         return gregorianCalendar.getTimeInMillis();
     }
 
-    public static void setPoster(final Context context, String relativePath, final ImageView img){
+    public static void setPoster(final Context context, String relativePath, final ImageView img) {
         final String url = "http://image.tmdb.org/t/p/w185"+relativePath;
         Picasso picasso = Picasso.with(context);
         picasso.setIndicatorsEnabled(true);
@@ -41,5 +42,9 @@ public class Utility {
                 Picasso.with(context).load(url).placeholder(R.drawable.poster_placeholder).into(img);
             }
         });
+    }
+
+    public static String getIDFromUri(Uri uri) {
+        return uri.getPathSegments().get(1);
     }
 }

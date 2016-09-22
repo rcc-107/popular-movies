@@ -144,6 +144,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         final String TMDB_POPULARITY = "popularity";
         final String TMDB_VOTE_AVERAGE = "vote_average";
         final String TMDB_POSTER_PATH = "poster_path";
+        final String TMDB_BACKDROP_PATH = "backdrop_path";
         //for debugging
         Log.d("movie json",movieJSONStr);
         try{
@@ -161,6 +162,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 Double popularity = resultsJO.getDouble(TMDB_POPULARITY);
                 Double vote_average = resultsJO.getDouble(TMDB_VOTE_AVERAGE);
                 String poster = resultsJO.getString(TMDB_POSTER_PATH);
+                String backdrop = resultsJO.getString(TMDB_BACKDROP_PATH);
                 long date_today = Utility.normalizeDate(System.currentTimeMillis());
 
                 ContentValues movieValues = new ContentValues();
@@ -171,6 +173,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 movieValues.put(MovieContract.MovieEntry.POPULARITY,popularity);
                 movieValues.put(MovieContract.MovieEntry.VOTE_AVERAGE,vote_average);
                 movieValues.put(MovieContract.MovieEntry.POSTER_PATH,poster);
+                movieValues.put(MovieContract.MovieEntry.BACKDROP_PATH,backdrop);
                 movieValues.put(MovieContract.MovieEntry.DATE_ADDED,date_today);
 
                 movieVector.add(movieValues);

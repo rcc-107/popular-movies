@@ -20,8 +20,8 @@ public class MovieProvider extends ContentProvider {
 
     private static final int MOVIE_SORT_POPULARITY = 100;
     private static final int MOVIE_SORT_VOTE = 101;
-    private static final int MOVIES = 102;
-    private static final int MOVIE_WITH_ID = 103;
+    private static final int MOVIE_WITH_ID = 102;
+    private static final int MOVIES = 103;
 
 
     @Override
@@ -45,10 +45,10 @@ public class MovieProvider extends ContentProvider {
                 returnCursor = db.query(MovieContract.MovieEntry.TABLE_NAME,
                         projection,selection,selectArgs,null,null,sort);
                 break;
-            /*case MOVIE_WITH_ID:
+            case MOVIE_WITH_ID:
                 returnCursor = db.query(MovieContract.MovieEntry.TABLE_NAME,
-                        projection,selection,selectArgs,null,null,sort);
-                break;*/
+                        projection,selection,selectArgs,null,null,null);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown Uri: "+uri);
         }
@@ -136,8 +136,8 @@ public class MovieProvider extends ContentProvider {
         final String authority = MovieContract.CONTENT_AUTHORITY;
         matcher.addURI(authority, MovieContract.PATH_MOVIES+"/popularity",MOVIE_SORT_POPULARITY);
         matcher.addURI(authority, MovieContract.PATH_MOVIES+"/vote_average",MOVIE_SORT_VOTE);
-        matcher.addURI(authority, MovieContract.PATH_MOVIES,MOVIES);
         matcher.addURI(authority, MovieContract.PATH_MOVIES+"/*",MOVIE_WITH_ID);
+        matcher.addURI(authority, MovieContract.PATH_MOVIES,MOVIES);
 
         return matcher;
     }

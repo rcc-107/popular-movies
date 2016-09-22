@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,16 +27,18 @@ import com.rica.popularmovies.data.MovieContract;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, RecyclerViewAdapter.ItemClickListener {
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
+    private Cursor cursor;
     static RecyclerViewAdapter rvAdapter;
     private static final int NUM_COUNT = 3;
     private static final int LOADER_ID = 1;
 
     private static final String[] Movie_Colums = {
         MovieContract.MovieEntry.TITLE,
+        MovieContract.MovieEntry.MOVIE_ID,
         MovieContract.MovieEntry.SYNOPSIS,
         MovieContract.MovieEntry.POSTER_PATH,
         MovieContract.MovieEntry.POPULARITY,
@@ -47,12 +48,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     };
 
     static final int TITLE = 0;
-    static final int SYNOPSIS = 1;
-    static final int POSTER_PATH = 2;
-    static final int POPULARITY = 3;
-    static final int VOTE_AVERAGE = 4;
-    static final int RELEASE_DATE = 5;
-    static final int DATE_ADDED = 6;
+    static final int MOVIE_ID = 1;
+    static final int SYNOPSIS = 2;
+    static final int POSTER_PATH = 3;
+    static final int POPULARITY = 4;
+    static final int VOTE_AVERAGE = 5;
+    static final int RELEASE_DATE = 6;
+    static final int DATE_ADDED = 7;
 
     public MainActivityFragment() {
         setHasOptionsMenu(true);
@@ -62,7 +64,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-        rvAdapter = new RecyclerViewAdapter(getContext());
+        rvAdapter = new RecyclerViewAdapter(getContext(), this);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
         layoutManager = new GridLayoutManager(getActivity(),NUM_COUNT);
         recyclerView.setLayoutManager(layoutManager);
@@ -106,7 +108,19 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     public void updateList(){
         getLoaderManager().restartLoader(LOADER_ID,null,this);
-        Log.d("updateList", "executed");
+    }
+
+    @Override
+    public void itemClicked(View v, int position) {
+        if(!cursor.isClosed()) {
+            if (cursor.moveToPosition(position)) {
+                ((Callback) getActivity()).onItemClicked(MovieContract.MovieEntry.buildMovieUriWithMovieID(cursor.getInt(MOVIE_ID)));
+            }
+        }
+    }
+
+    public interface Callback {
+        void onItemClicked(Uri movieID);
     }
 
     @Override
@@ -127,11 +141,12 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
        rvAdapter.swapCursor(data);
-        Log.d("cursor: ",data.toString());
+       cursor = data;
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         rvAdapter.swapCursor(null);
     }
+
 }

@@ -17,8 +17,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private Context context;
     private Cursor cursor;
+    private static ItemClickListener icl;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         LinearLayout root;
         ImageView imageView;
         TextView textView;
@@ -26,14 +27,25 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         public ViewHolder(View itemView) {
             super(itemView);
             root = (LinearLayout) itemView;
+            root.setOnClickListener(this);
             imageView = (ImageView) root.findViewById(R.id.imageView);
             textView = (TextView) root.findViewById(R.id.text);
             textView2 = (TextView) root.findViewById(R.id.text2);
         }
+
+        @Override
+        public void onClick(View view) {
+            icl.itemClicked(view,getAdapterPosition());
+        }
     }
 
-    RecyclerViewAdapter(Context context) {
+    public interface ItemClickListener {
+        void itemClicked(View v, int position);
+    }
+
+    RecyclerViewAdapter(Context context, ItemClickListener icl) {
         this.context = context;
+        this.icl = icl;
     }
 
     @Override
@@ -47,8 +59,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(ViewHolder holder, int position) {
         if(cursor.moveToPosition(position)){
             Utility.setPoster(context,cursor.getString(MainActivityFragment.POSTER_PATH),holder.imageView);
-            holder.textView.setText(cursor.getString(MainActivityFragment.VOTE_AVERAGE));
-            holder.textView2.setText(cursor.getString(MainActivityFragment.POPULARITY));
+            /*holder.textView.setText(cursor.getString(MainActivityFragment.VOTE_AVERAGE));
+            holder.textView2.setText(cursor.getString(MainActivityFragment.POPULARITY));*/
         }
     }
 
