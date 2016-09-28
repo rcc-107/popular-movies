@@ -22,7 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.rica.popularmovies.data.MovieContract;
+import com.rica.popularmovies.data.MovieContract.MovieEntry;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -37,14 +37,14 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private static final int LOADER_ID = 1;
 
     private static final String[] Movie_Colums = {
-        MovieContract.MovieEntry.TITLE,
-        MovieContract.MovieEntry.MOVIE_ID,
-        MovieContract.MovieEntry.SYNOPSIS,
-        MovieContract.MovieEntry.POSTER_PATH,
-        MovieContract.MovieEntry.POPULARITY,
-        MovieContract.MovieEntry.VOTE_AVERAGE,
-        MovieContract.MovieEntry.RELEASE_DATE,
-        MovieContract.MovieEntry.DATE_ADDED
+        MovieEntry.TITLE,
+        MovieEntry.MOVIE_ID,
+        MovieEntry.SYNOPSIS,
+        MovieEntry.POSTER_PATH,
+        MovieEntry.POPULARITY,
+        MovieEntry.VOTE_AVERAGE,
+        MovieEntry.RELEASE_DATE,
+        MovieEntry.DATE_ADDED
     };
 
     static final int TITLE = 0;
@@ -114,7 +114,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public void itemClicked(View v, int position) {
         if(!cursor.isClosed()) {
             if (cursor.moveToPosition(position)) {
-                ((Callback) getActivity()).onItemClicked(MovieContract.MovieEntry.buildMovieUriWithMovieID(cursor.getInt(MOVIE_ID)));
+                ((Callback) getActivity()).onItemClicked(MovieEntry.buildMovieUriWithMovieID(cursor.getInt(MOVIE_ID)));
             }
         }
     }
@@ -126,13 +126,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String sort = sp.getString(getString(R.string.pref_sort_key),getString(R.string.popularity))+" Desc";
+        String sort = sp.getString(getString(R.string.pref_sort_key),MovieEntry.POPULARITY)+" Desc";
         Uri moviesUri;
 
         if(getString(R.string.popularity)==sort) {
-            moviesUri = MovieContract.MovieEntry.buildMovieUriSortByPopularity();
+            moviesUri = MovieEntry.buildMovieUriSortByPopularity();
         }else /*if(getString(R.string.vote_desc).equals(sort))*/{
-            moviesUri = MovieContract.MovieEntry.buildMovieUriSortByVote();
+            moviesUri = MovieEntry.buildMovieUriSortByVote();
         }
 
         return new CursorLoader(getContext(),moviesUri,Movie_Colums,null,null,sort);

@@ -6,9 +6,13 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import com.rica.popularmovies.data.MovieContract.MovieEntry;
+import com.rica.popularmovies.data.MovieContract.MovieVideos;
 
 /**
  * Created by Rica on 8/18/2016.
@@ -17,11 +21,21 @@ public class MovieProvider extends ContentProvider {
 
     private MovieDBHelper movieDBHelper;
     private static final UriMatcher mUriMatcher = buildUriMatcher();
+    private static final SQLiteQueryBuilder sqlBuilder;
 
     private static final int MOVIE_SORT_POPULARITY = 100;
     private static final int MOVIE_SORT_VOTE = 101;
     private static final int MOVIE_WITH_ID = 102;
-    private static final int MOVIES = 103;
+    private static final int MOVIE_VIDEO_WITH_ID = 103;
+    private static final int MOVIES = 104;
+    private static final int VIDEO = 105;
+
+    static {
+        sqlBuilder = new SQLiteQueryBuilder();
+        sqlBuilder.setTables( MovieEntry.TABLE_NAME + " INNER JOIN " + MovieVideos.TABLE_NAME +
+        " ON " + MovieEntry.TABLE_NAME + "." + MovieEntry.MOVIE_ID +
+                " = " + MovieVideos.TABLE_NAME + "." + MovieVideos.MOVIE_ID);
+    }
 
 
     @Override
@@ -38,16 +52,16 @@ public class MovieProvider extends ContentProvider {
         final int matcher = mUriMatcher.match(uri);
         switch(matcher){
             case MOVIE_SORT_POPULARITY:
-                returnCursor = db.query(MovieContract.MovieEntry.TABLE_NAME,
+                returnCursor = db.query(MovieEntry.TABLE_NAME,
                         projection,selection,selectArgs,null,null,sort);
                 break;
             case MOVIE_SORT_VOTE:
-                returnCursor = db.query(MovieContract.MovieEntry.TABLE_NAME,
+                returnCursor = db.query(MovieEntry.TABLE_NAME,
                         projection,selection,selectArgs,null,null,sort);
                 break;
             case MOVIE_WITH_ID:
-                returnCursor = db.query(MovieContract.MovieEntry.TABLE_NAME,
-                        projection,selection,selectArgs,null,null,null);
+                returnCursor = sqlBuilder.query(db,projection,selection,selectArgs,null,null,sort);
+                Log.d("query single m", returnCursor.toString());
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown Uri: "+uri);
@@ -62,9 +76,9 @@ public class MovieProvider extends ContentProvider {
         final int match = mUriMatcher.match(uri);
         switch (match){
             case MOVIES:
-                return MovieContract.MovieEntry.CONTENT_TYPE;
+                return MovieEntry.CONTENT_TYPE;
             case MOVIE_WITH_ID:
-                return MovieContract.MovieEntry.CONTENT_ITEM_TYPE;
+                return MovieEntry.CONTENT_ITEM_TYPE;
         }
         return null;
     }
@@ -78,9 +92,17 @@ public class MovieProvider extends ContentProvider {
 
         switch (matcher){
             case MOVIES:
-                long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME,null,contentValues);
+                long _id = db.insert(MovieEntry.TABLE_NAME,null,contentValues);
                 if(_id != -1){
-                    retUri = MovieContract.MovieEntry.buildMovieUri(_id);
+                    retUri = MovieEntry.buildMovieUri(_id);
+                }else{
+                    throw new SQLException("Failed to insert row into "+uri);
+                }
+                break;
+            case VIDEO:
+                long video_id = db.insert(MovieVideos.TABLE_NAME,null,contentValues);
+                if(video_id != -1){
+                    retUri = MovieEntry.buildMovieUri(video_id);
                 }else{
                     throw new SQLException("Failed to insert row into "+uri);
                 }
@@ -114,7 +136,7 @@ public class MovieProvider extends ContentProvider {
                 int retCount = 0;
                 try{
                     for(ContentValues value:values){
-                        long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME,null,value);
+                        long _id = db.insert(MovieEntry.TABLE_NAME,null,value);
                         Log.d("Bulkinsert",value+" inserted");
                         if(_id != -1){
                             retCount++;
@@ -126,6 +148,23 @@ public class MovieProvider extends ContentProvider {
                 }
                 getContext().getContentResolver().notifyChange(uri,null);
                 return retCount;
+            case VIDEO:
+                db.beginTransaction();
+                int rowCount = 0;
+                try{
+                    for(ContentValues value:values){
+                        long _id = db.insert(MovieVideos.TABLE_NAME,null,value);
+                        Log.d("Bulkinsert","Video "+value+" inserted");
+                        if(_id != -1){
+                            rowCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return rowCount;
             default:
                 return super.bulkInsert(uri, values);
         }
@@ -136,8 +175,10 @@ public class MovieProvider extends ContentProvider {
         final String authority = MovieContract.CONTENT_AUTHORITY;
         matcher.addURI(authority, MovieContract.PATH_MOVIES+"/popularity",MOVIE_SORT_POPULARITY);
         matcher.addURI(authority, MovieContract.PATH_MOVIES+"/vote_average",MOVIE_SORT_VOTE);
+        matcher.addURI(authority, MovieContract.PATH_VIDEOS+"/*",MOVIE_VIDEO_WITH_ID);
         matcher.addURI(authority, MovieContract.PATH_MOVIES+"/*",MOVIE_WITH_ID);
         matcher.addURI(authority, MovieContract.PATH_MOVIES,MOVIES);
+        matcher.addURI(authority, MovieContract.PATH_VIDEOS,VIDEO);
 
         return matcher;
     }

@@ -20,7 +20,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.rica.popularmovies.data.MovieContract;
+import com.rica.popularmovies.data.MovieContract.MovieEntry;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -39,15 +39,15 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private ImageView poster;
 
     private static final String[] MOVIE_COLUMNS = {
-            MovieContract.MovieEntry.TITLE,
-            MovieContract.MovieEntry.MOVIE_ID,
-            MovieContract.MovieEntry.SYNOPSIS,
-            MovieContract.MovieEntry.POSTER_PATH,
-            MovieContract.MovieEntry.POPULARITY,
-            MovieContract.MovieEntry.VOTE_AVERAGE,
-            MovieContract.MovieEntry.RELEASE_DATE,
-            MovieContract.MovieEntry.BACKDROP_PATH,
-            MovieContract.MovieEntry.DATE_ADDED
+            MovieEntry.TITLE,
+            MovieEntry.TABLE_NAME+"."+MovieEntry.MOVIE_ID,
+            MovieEntry.SYNOPSIS,
+            MovieEntry.POSTER_PATH,
+            MovieEntry.POPULARITY,
+            MovieEntry.VOTE_AVERAGE,
+            MovieEntry.RELEASE_DATE,
+            MovieEntry.BACKDROP_PATH,
+            MovieEntry.DATE_ADDED
     };
 
     static final int TITLE = 0;
@@ -109,7 +109,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if(uri != null){
-            String selection = MovieContract.MovieEntry.MOVIE_ID + " = ? ";
+            String selection = MovieEntry.TABLE_NAME+"."+MovieEntry.MOVIE_ID + " = ? ";
             String[] selectionArgs = {Utility.getIDFromUri(uri)};
             return new CursorLoader(getContext(),uri,MOVIE_COLUMNS,selection,selectionArgs,null);
         }
