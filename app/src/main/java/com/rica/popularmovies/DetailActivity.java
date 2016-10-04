@@ -10,6 +10,7 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
         if(savedInstanceState == null) {
             Bundle arg = new Bundle();
             arg.putParcelable(DetailActivityFragment.MOVIE_URI, getIntent().getData());

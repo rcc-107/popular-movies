@@ -11,6 +11,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,9 +19,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.rica.popularmovies.data.MovieContract.MovieEntry;
+import com.rica.popularmovies.data.MovieContract.MovieVideos;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -37,6 +40,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private TextView popularity;
     private TextView vote;
     private ImageView poster;
+    private LinearLayout trailer_container;
 
     private static final String[] MOVIE_COLUMNS = {
             MovieEntry.TITLE,
@@ -47,7 +51,9 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             MovieEntry.VOTE_AVERAGE,
             MovieEntry.RELEASE_DATE,
             MovieEntry.BACKDROP_PATH,
-            MovieEntry.DATE_ADDED
+            MovieEntry.DATE_ADDED,
+            MovieVideos.VIDEO_TITLE,
+            MovieVideos.VIDEO_PATH
     };
 
     static final int TITLE = 0;
@@ -59,6 +65,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     static final int RELEASE_DATE = 6;
     static final int BACKDROP = 7;
     static final int DATE_ADDED = 8;
+    static final int VIDEO_TITLE = 9;
+    static final int VIDEO_PATH = 10;
 
     public DetailActivityFragment() {
         setHasOptionsMenu(true);
@@ -78,6 +86,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         popularity = (TextView) view.findViewById(R.id.moviePopularity);
         vote = (TextView) view.findViewById(R.id.movieVote);
         poster = (ImageView) view.findViewById(R.id.moviePoster);
+        trailer_container = (LinearLayout) view.findViewById(R.id.trailers_container);
         return view;
     }
 
@@ -86,7 +95,10 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         super.onActivityCreated(savedInstanceState);
         View view = getView();
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        AppCompatActivity aca = (AppCompatActivity) getActivity();
+        aca.setSupportActionBar(toolbar);
+        aca.setTitle(null);
+        aca.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getLoaderManager().initLoader(LOADER_ID,null,this);
     }
 
@@ -98,10 +110,14 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.action_settings){
-            Intent intent = new Intent(getContext(), SettingsActivity.class);
-            startActivity(intent);
-            return true;
+        switch (item.getItemId()){
+            case android.R.id.home:
+                getActivity().supportFinishAfterTransition();
+                return true;
+            case R.id.action_settings:
+                Intent intent = new Intent(getContext(), SettingsActivity.class);
+                startActivity(intent);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -125,6 +141,27 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             popularity.setText(data.getString(POPULARITY));
             vote.setText(data.getString(VOTE_AVERAGE));
             Utility.setPoster(getContext(),data.getString(BACKDROP),poster);
+            for(int i=0; i<data.getCount(); i++) {
+                TextView trailer_title = new TextView(getContext());
+                trailer_title.setGravity(Gravity.VERTICAL_GRAVITY_MASK);
+                trailer_title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.play,0,0,0);
+                trailer_title.setText(data.getString(VIDEO_TITLE));
+                final String path = data.getString(VIDEO_PATH);
+                trailer_title.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Uri uri = Uri.parse("https://www.youtube.com/watch?v=").buildUpon().appendPath(path).build();
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(uri);
+
+                        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                            startActivity(intent);
+                        }
+                    }
+                });
+                trailer_container.addView(trailer_title);
+                data.moveToNext();
+            }
         }
     }
 

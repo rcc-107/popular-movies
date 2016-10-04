@@ -5,18 +5,35 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context="com.rica.popularmovies.DetailActivity">
-
     <android.support.design.widget.AppBarLayout
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:fitsSystemWindows="false"
+        app:expanded="true">
+        <android.support.design.widget.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="@color/colorPrimary">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@android:dimen/thumbnail_height"
+                android:scaleType="centerCrop"
+                android:id="@+id/moviePoster"
+                app:layout_collapseParallaxMultiplier="1.0" />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:layout_collapseParallaxMultiplier="1.0"
+                app:layout_collapseMode="parallax" />
+        </android.support.design.widget.CollapsingToolbarLayout>
 
     </android.support.design.widget.AppBarLayout>
     <android.support.v4.widget.NestedScrollView
@@ -25,13 +42,9 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
         <LinearLayout
             android:layout_width="match_parent" android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="200dp"
-                android:id="@+id/moviePoster" />
+            android:orientation="vertical"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_vertical_margin">
 
             <TextView
                 android:id="@+id/movieTitle"
@@ -87,7 +100,8 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_marginBottom="@dimen/default_gap">
 
                 <TextView
                     android:text="Vote Average: "
@@ -106,10 +120,16 @@
 
             </LinearLayout>
 
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@android:drawable/divider_horizontal_textfield"/>
+
             <TextView
                 android:text="Synopsis"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/default_gap"
                 android:id="@+id/textView4"
                 android:layout_weight="1"
                 android:textColor="@android:color/black" />
@@ -118,9 +138,31 @@
                 android:id="@+id/movieSynopsis"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="Synopsis"/>
+                android:layout_marginBottom="@dimen/default_gap"
+                tools:text="Synopsis of movie"/>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="1dp"
+                android:background="@android:drawable/divider_horizontal_textfield"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/default_gap"
+                android:id="@+id/trailers_container">
+
+                <TextView
+                    android:text="Videos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView5"
+                    android:textColor="@android:color/black" />
+            </LinearLayout>
 
         </LinearLayout>
+
     </android.support.v4.widget.NestedScrollView>
 
 </android.support.design.widget.CoordinatorLayout>
