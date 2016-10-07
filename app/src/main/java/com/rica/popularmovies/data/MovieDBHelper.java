@@ -31,6 +31,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 MovieEntry.VOTE_AVERAGE + " INTEGER NOT NULL," +
                 MovieEntry.POSTER_PATH + " TEXT NOT NULL," +
                 MovieEntry.BACKDROP_PATH + " TEXT NOT NULL," +
+                MovieEntry.FAVORITES + " BOOLEAN NOT NULL DEFAULT TRUE," +
                 MovieEntry.DATE_ADDED + " INTEGER NOT NULL);";
 
         final String CREATE_VIDEOS_TABLE = "CREATE TABLE " + MovieVideos.TABLE_NAME + " (" +

@@ -29,6 +29,7 @@ public class MovieContract {
         public static final String SYNOPSIS = "synopsis";
         public static final String POSTER_PATH = "poster_path";
         public static final String BACKDROP_PATH = "backdrop_path";
+        public static final String FAVORITES = "favorites";
         public static final String DATE_ADDED = "date_added";
 
         ///// content://com.rica.popularmovies/movies/10900908
@@ -41,7 +42,7 @@ public class MovieContract {
             return CONTENT_URI.buildUpon().appendPath("date").appendPath(Long.toString(Utility.normalizeDate(date))).build();
         }*/
 
-        public static Uri buildMovieUriSortByPopularity(){
+        public static Uri buildMovieUriSortByPopularity() {
             return CONTENT_URI.buildUpon().appendPath(POPULARITY).build();
         }
 
@@ -51,6 +52,10 @@ public class MovieContract {
 
         public static Uri buildMovieUriWithMovieID(int movieID) {
             return CONTENT_URI.buildUpon().appendPath(Integer.toString(movieID)).build();
+        }
+
+        public static Uri buildMovieUriWithFavorites() {
+            return CONTENT_URI.buildUpon().appendPath(FAVORITES).build();
         }
     }
 

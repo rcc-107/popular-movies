@@ -1,4 +1,4 @@
-package com.rica.popularmovies;
+package com.rica.popularmovies.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -10,6 +10,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.rica.popularmovies.R;
+import com.rica.popularmovies.Utility;
+import com.rica.popularmovies.fragments.MainActivityFragment;
+
 /**
  * Created by Rica on 9/2/2016.
  */
@@ -17,9 +21,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private Context context;
     private Cursor cursor;
-    private static ItemClickListener icl;
+    private ItemClickListener icl;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         LinearLayout root;
         ImageView imageView;
         TextView textView;
@@ -43,7 +47,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         void itemClicked(View v, int position);
     }
 
-    RecyclerViewAdapter(Context context, ItemClickListener icl) {
+    public RecyclerViewAdapter(Context context, ItemClickListener icl) {
         this.context = context;
         this.icl = icl;
     }

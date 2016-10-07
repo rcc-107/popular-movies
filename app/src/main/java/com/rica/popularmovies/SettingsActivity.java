@@ -7,12 +7,14 @@ import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.rica.popularmovies.fragments.MainActivityFragment;
+
 /**
  * Created by Rica on 9/10/2016.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
-    static boolean sortOrder;
+    public static boolean sortOrder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

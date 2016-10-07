@@ -3,6 +3,8 @@ package com.rica.popularmovies;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.rica.popularmovies.fragments.DetailActivityFragment;
+
 public class DetailActivity extends AppCompatActivity {
 
     private final String FRAGMENTTAG = "DAFTAG";

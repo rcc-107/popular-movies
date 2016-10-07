@@ -29,6 +29,7 @@ public class MovieProvider extends ContentProvider {
     private static final int MOVIE_VIDEO_WITH_ID = 103;
     private static final int MOVIES = 104;
     private static final int VIDEO = 105;
+    private static final int MOVIE_FAVORITES = 106;
 
     static {
         sqlBuilder = new SQLiteQueryBuilder();
@@ -51,6 +52,10 @@ public class MovieProvider extends ContentProvider {
         SQLiteDatabase db = movieDBHelper.getReadableDatabase();
         final int matcher = mUriMatcher.match(uri);
         switch(matcher){
+            case MOVIE_FAVORITES:
+                returnCursor = db.query(MovieEntry.TABLE_NAME,projection,selection,selectArgs,null,null,sort);
+                Log.d("favorites", "case met " + returnCursor.getCount());
+                break;
             case MOVIE_SORT_POPULARITY:
                 returnCursor = db.query(MovieEntry.TABLE_NAME,
                         projection,selection,selectArgs,null,null,sort);
@@ -61,7 +66,6 @@ public class MovieProvider extends ContentProvider {
                 break;
             case MOVIE_WITH_ID:
                 returnCursor = sqlBuilder.query(db,projection,selection,selectArgs,null,null,sort);
-                Log.d("query single m", returnCursor.toString());
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown Uri: "+uri);
@@ -175,6 +179,7 @@ public class MovieProvider extends ContentProvider {
         final String authority = MovieContract.CONTENT_AUTHORITY;
         matcher.addURI(authority, MovieContract.PATH_MOVIES+"/popularity",MOVIE_SORT_POPULARITY);
         matcher.addURI(authority, MovieContract.PATH_MOVIES+"/vote_average",MOVIE_SORT_VOTE);
+        matcher.addURI(authority, MovieContract.PATH_MOVIES+"/favorites",MOVIE_FAVORITES);
         matcher.addURI(authority, MovieContract.PATH_VIDEOS+"/*",MOVIE_VIDEO_WITH_ID);
         matcher.addURI(authority, MovieContract.PATH_MOVIES+"/*",MOVIE_WITH_ID);
         matcher.addURI(authority, MovieContract.PATH_MOVIES,MOVIES);

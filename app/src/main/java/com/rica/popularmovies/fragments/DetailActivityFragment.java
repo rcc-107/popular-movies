@@ -1,4 +1,4 @@
-package com.rica.popularmovies;
+package com.rica.popularmovies.fragments;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -22,6 +22,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.rica.popularmovies.R;
+import com.rica.popularmovies.SettingsActivity;
+import com.rica.popularmovies.Utility;
 import com.rica.popularmovies.data.MovieContract.MovieEntry;
 import com.rica.popularmovies.data.MovieContract.MovieVideos;
 

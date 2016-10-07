@@ -2,7 +2,7 @@
     <string name="app_name">Popular Movies</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">Popular Movies</string>
     <string name="action_settings">Settings</string>
     <string name="release_date">release_date.desc</string>
 
@@ -23,6 +23,8 @@
     <string name="pref_sort_title">Sort Order</string>
     <string name="pref_sort_defVal">popularity</string>
     <string name="pref_sort_key">sort order</string>
+
     <string name="title_activity_detail">DetailActivity</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 
 </resources>
