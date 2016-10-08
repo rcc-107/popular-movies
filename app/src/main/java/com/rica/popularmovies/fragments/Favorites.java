@@ -31,7 +31,7 @@ public class Favorites extends Fragment implements LoaderManager.LoaderCallbacks
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private Cursor cursor;
-    static RecyclerViewAdapter rvAdapter;
+    public static RecyclerViewAdapter rvAdapter;
     private static final int GRID_NUM_COUNT = 3;
     private static final int LOADER_ID = 2;
 

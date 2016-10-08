@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.rica.popularmovies.fragments.Favorites;
 import com.rica.popularmovies.fragments.MainActivityFragment;
 
 /**
@@ -66,6 +67,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
             Log.d("SharedPreferenceChanged"," executed");
             MainActivityFragment.rvAdapter.notifyDataSetChanged();
+            Favorites.rvAdapter.notifyDataSetChanged();
             sortOrder = true;
         }
     }

@@ -90,7 +90,6 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         super.onResume();
         if(SettingsActivity.sortOrder){
            updateList();
-            SettingsActivity.sortOrder = false;
         }
     }
 
