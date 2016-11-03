@@ -14,6 +14,7 @@ public class MovieContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://"+CONTENT_AUTHORITY);
     public static final String PATH_MOVIES = "movies";
     public static final String PATH_VIDEOS = "videos";
+    public static final String PATH_REVIEWS = "reviews";
 
     public static final class MovieEntry implements BaseColumns {
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIES).build();
@@ -67,6 +68,16 @@ public class MovieContract {
         public static final String VIDEO_ID = "video_id";
         public static final String VIDEO_TITLE = "title";
         public static final String VIDEO_PATH = "path";
+    }
+
+    public static final class MovieReviews implements BaseColumns {
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEWS).build();
+
+        public static final String TABLE_NAME = "reviews";
+        public static final String MOVIE_ID = "movie_id"; //foreign Key
+        public static final String REVIEW_ID = "review_id";
+        public static final String REVIEW_AUTHOR = "author";
+        public static final String REVIEW_CONTENT = "content";
     }
 
 }

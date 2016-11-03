@@ -6,12 +6,15 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.facebook.stetho.Stetho;
 import com.rica.popularmovies.fragments.Favorites;
@@ -22,19 +25,7 @@ import static com.facebook.stetho.Stetho.newInitializerBuilder;
 
 public class TabbedActivity extends AppCompatActivity implements MainActivityFragment.Callback {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
     private ViewPager mViewPager;
 
     @Override
@@ -56,7 +47,19 @@ public class TabbedActivity extends AppCompatActivity implements MainActivityFra
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.setupWithViewPager(mViewPager);
 
+        LinearLayout customTabLayout = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        TextView tabText = (TextView) customTabLayout.findViewById(R.id.tab_textview);
+        tabText.setText("Movies");
+        tabLayout.getTabAt(0).setCustomView(customTabLayout);
+
+
+        LinearLayout customTabLayout2 = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        TextView tabText2 = (TextView) customTabLayout2.findViewById(R.id.tab_textview);
+        tabText2.setText("Favorites");
+        tabLayout.getTabAt(1).setCustomView(customTabLayout2);
+
         MovieSyncAdapter.initializeAdapter(getApplicationContext());
+
     }
 
 
@@ -84,11 +87,7 @@ public class TabbedActivity extends AppCompatActivity implements MainActivityFra
         startActivity(intent);
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);

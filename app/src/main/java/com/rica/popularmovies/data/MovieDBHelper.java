@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.rica.popularmovies.data.MovieContract.MovieEntry;
 import com.rica.popularmovies.data.MovieContract.MovieVideos;
 
+import com.rica.popularmovies.data.MovieContract.MovieReviews;
+
 /**
  * Created by Rica on 8/18/2016.
  */
@@ -43,8 +45,18 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 " FOREIGN KEY("+ MovieVideos.MOVIE_ID+")"+" REFERENCES "+
                 MovieEntry.TABLE_NAME+"("+MovieEntry.MOVIE_ID+"));";
 
+        final String CREATE_REVIEWS_TABLE = "CREATE TABLE " + MovieReviews.TABLE_NAME + " (" +
+                MovieReviews._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                MovieReviews.REVIEW_ID + " TEXT,"+
+                MovieReviews.REVIEW_AUTHOR + " TEXT,"+
+                MovieReviews.REVIEW_CONTENT + " TEXT,"+
+                MovieReviews.MOVIE_ID + " TEXT,"+
+                " FOREIGN KEY("+ MovieReviews.MOVIE_ID+")"+" REFERENCES "+
+                MovieEntry.TABLE_NAME+"("+MovieEntry.MOVIE_ID+"));";
+
         sqLiteDatabase.execSQL(CREATE_MOVIES_TABLE);
         sqLiteDatabase.execSQL(CREATE_VIDEOS_TABLE);
+        sqLiteDatabase.execSQL(CREATE_REVIEWS_TABLE);
     }
 
     @Override

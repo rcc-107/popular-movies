@@ -15,6 +15,7 @@ import android.util.Log;
 import com.rica.popularmovies.R;
 import com.rica.popularmovies.Utility;
 import com.rica.popularmovies.data.MovieContract.MovieEntry;
+import com.rica.popularmovies.data.MovieContract.MovieReviews;
 import com.rica.popularmovies.data.MovieContract.MovieVideos;
 
 import org.json.JSONArray;
@@ -103,9 +104,34 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         BufferedReader bufferedReader = null;
         try{
             if(fetch == Options.VIDEOS) {
-                for(int i = 0; i< movieIDList.size(); i++) {
+                for (int i = 0; i < movieIDList.size(); i++) {
                     Uri uri = Uri.parse("https://api.themoviedb.org/3/movie").buildUpon()
                             .appendPath(Integer.toString(movieIDList.get(i))).appendPath("videos")
+                            .appendQueryParameter("api_key", "62e177741ae6467e6af95e2c21d57c6e").build();
+                    URL url = new URL(uri.toString());
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+                    httpURLConnection.setRequestMethod("GET");
+                    httpURLConnection.connect();
+
+                    InputStream inputStream = httpURLConnection.getInputStream();
+                    StringBuffer stringBuffer = new StringBuffer();
+                    if (inputStream == null) {
+                        return;
+                    }
+                    bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        stringBuffer.append(line + "\n");
+                    }
+                    if (stringBuffer.length() == 0) {
+                        return;
+                    }
+                    getVideoDataFromJSON(stringBuffer.toString());
+                }
+            }else if(fetch == Options.REVIEWS) {
+                for(int i = 0; i< movieIDList.size(); i++) {
+                    Uri uri = Uri.parse("https://api.themoviedb.org/3/movie").buildUpon()
+                            .appendPath(Integer.toString(movieIDList.get(i))).appendPath("reviews")
                             .appendQueryParameter("api_key","62e177741ae6467e6af95e2c21d57c6e").build();
                     URL url = new URL(uri.toString());
                     httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -125,8 +151,8 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                     if (stringBuffer.length() == 0) {
                         return;
                     }
-                    Log.d("httpURLConnection Vid","url: "+uri.toString()+ " returned: " + stringBuffer.toString());
-                    getVideoDataFromJSON(stringBuffer.toString());
+                    Log.d("httpURLConnection Rev","url: "+uri.toString()+ " returned: " + stringBuffer.toString());
+                    getReviewsDataFromJSON(stringBuffer.toString());
                 }
             }else{
                 Uri uri = Uri.parse("https://api.themoviedb.org/3/discover/movie").buildUpon()
@@ -150,7 +176,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 if (stringBuffer.length() == 0) {
                     return;
                 }
-                Log.d("httpURLConnection", "returned: " + stringBuffer.toString());
                 getMovieDataFromJSON(stringBuffer.toString());
             }
         }catch (IOException e){
@@ -167,41 +192,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
         }
-    }
-
-    /*private Uri getMovieUri(int movieID) {
-        switch (fetch){
-            case LIST:
-                Log.d("getMovieUri","fetch matched list");
-                return Uri.parse("https://api.themoviedb.org/3/discover/movie").buildUpon()
-                    .appendQueryParameter("sort_by", this.context.getString(R.string.release_date))
-                    .appendQueryParameter("api_key","62e177741ae6467e6af95e2c21d57c6e").build();
-            case VIDEOS:
-                Log.d("getMovieUri","fetch matched videos");
-                return Uri.parse("https://api.themoviedb.org/3/movie").buildUpon()
-                        .appendPath(Integer.toString(movieID))
-                        .appendQueryParameter("api_key","62e177741ae6467e6af95e2c21d57c6e").build();
-            case REVIEWS:
-                return Uri.parse(BASE_URL).buildUpon()
-                        .appendQueryParameter(SORTBY, this.context.getString(R.string.release_date))
-                        .appendQueryParameter("api_key","62e177741ae6467e6af95e2c21d57c6e").build();
-            default:
-                Log.d("getMovieUri","fetch no match");
-                return null;
-        }
-    }*/
-
-    private void getDataFromJSON(String JSON) {
-       /* switch (fetch){
-            case LIST:
-                getMovieDataFromJSON(JSON);
-            case VIDEOS:
-                getMovieVideosFromJSON(JSON);
-            case REVIEWS:
-                getMovieReviewsFromJSON(JSON);
-            default:
-                Log.d("getMovieUri","fetch no match");
-        }*/
     }
 
     private void getMovieDataFromJSON(String movieJSONStr) {
@@ -255,7 +245,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 ContentValues[] cvArray = new ContentValues[movieVector.size()];
                 movieVector.toArray(cvArray);
                 this.context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI,cvArray);
-                Log.d("movielist",cvArray.toString());
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -293,15 +282,48 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 ContentValues[] cvArray = new ContentValues[vector.size()];
                 vector.toArray(cvArray);
                 this.context.getContentResolver().bulkInsert(MovieVideos.CONTENT_URI,cvArray);
-                Log.d("videolist",cvArray.toString());
-                fetch = Options.LIST;
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        fetch = Options.REVIEWS;
+        syncImmediately(this.context);
     }
 
-    private void getMovieReviewsFromJSON(String movieJSONStr) {}
+    private void getReviewsDataFromJSON(String movieJSONStr) {
+        final String REVIEWS_RESULT = "results";
+        final String REVIEWS_ID = "id";
+        final String REVIEWS_AUTHOR = "author";
+        final String REVIEWS_CONTENT = "content";
+        try{
+            JSONObject jsonObject = new JSONObject(movieJSONStr);
+            JSONArray results = jsonObject.getJSONArray(REVIEWS_RESULT);
+
+            Vector<ContentValues> vector = new Vector<>(results.length());
+            for (int index=0;index<results.length();index++) {
+                JSONObject reviewJObj = results.getJSONObject(index);
+                String movie_id = jsonObject.getString("id");
+                String review_id = reviewJObj.getString(REVIEWS_ID);
+                String author = reviewJObj.getString(REVIEWS_AUTHOR);
+                String content = reviewJObj.getString(REVIEWS_CONTENT);
+
+                ContentValues cv = new ContentValues();
+                cv.put(MovieReviews.REVIEW_ID, review_id);
+                cv.put(MovieReviews.MOVIE_ID, movie_id);
+                cv.put(MovieReviews.REVIEW_AUTHOR, author);
+                cv.put(MovieReviews.REVIEW_CONTENT, content);
+                vector.add(cv);
+            }
+            if(vector.size() > 0) {
+                ContentValues[] cvArray = new ContentValues[vector.size()];
+                vector.toArray(cvArray);
+                this.context.getContentResolver().bulkInsert(MovieReviews.CONTENT_URI,cvArray);
+                Log.d("reviewList",cvArray.toString());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        fetch = Options.LIST;
+    }
 
 }
