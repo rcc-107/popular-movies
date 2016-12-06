@@ -151,7 +151,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                     if (stringBuffer.length() == 0) {
                         return;
                     }
-                    Log.d("httpURLConnection Rev","url: "+uri.toString()+ " returned: " + stringBuffer.toString());
                     getReviewsDataFromJSON(stringBuffer.toString());
                 }
             }else{
@@ -206,8 +205,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         final String TMDB_VOTE_AVERAGE = "vote_average";
         final String TMDB_POSTER_PATH = "poster_path";
         final String TMDB_BACKDROP_PATH = "backdrop_path";
-        //for debugging
-        Log.d("movie json",movieJSONStr);
+
         try{
             JSONObject movieJSON = new JSONObject(movieJSONStr);
             JSONArray resultsJA = movieJSON.getJSONArray(TMDB_RESULTS);
@@ -318,7 +316,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 ContentValues[] cvArray = new ContentValues[vector.size()];
                 vector.toArray(cvArray);
                 this.context.getContentResolver().bulkInsert(MovieReviews.CONTENT_URI,cvArray);
-                Log.d("reviewList",cvArray.toString());
             }
         } catch (JSONException e) {
             e.printStackTrace();
