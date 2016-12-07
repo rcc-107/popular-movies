@@ -15,19 +15,15 @@ import com.rica.popularmovies.adapters.ReviewsAdapter;
 import com.rica.popularmovies.data.MovieContract.MovieReviews;
 import com.rica.popularmovies.fragments.DetailActivityFragment;
 
-/**
- * Created  Rica on 11/5/2016.
- */
-
-public class ReviewsCallback implements LoaderManager.LoaderCallbacks<Cursor> {
-    private Context context;
+public class VideosCallback extends LoaderManaget.LoaderCallbacks<Cursor> {
+			 private Context context;
     private Uri uri;
-    private String[] REVIEW_COLUMNS;
-
-    public  ReviewsCallback(Context context, String movieID, String[] COLUMNS) {
+    private String[] VIDEO_COLUMNS;
+    
+    public VideosCallback(Context context, String movieID, String[] COLUMNS) {
         this.context = context;
-        uri = ContentUris.withAppendedId(MovieReviews.CONTENT_URI,Long.parseLong(movieID));
-        REVIEW_COLUMNS = COLUMNS;
+        uri = ContentUris.withAppendedId(MovieVideos.CONTENT_URI,Long.parseLong(movieID));
+        VIDEO_COLUMNS = COLUMNS;
     }
 
     @Override
@@ -36,9 +32,8 @@ public class ReviewsCallback implements LoaderManager.LoaderCallbacks<Cursor> {
             String movieID = Utility.getIDFromUri(uri);
             String selection;
             String[] selectionArgs = {movieID};
-            Log.d("daf"," reviews oncreateloader");
-            selection = MovieReviews.MOVIE_ID + " = ? ";
-            CursorLoader cursorLoader = new CursorLoader(context,uri,REVIEW_COLUMNS,selection,selectionArgs,null);
+            selection = MovieVideos.MOVIE_ID + " = ? ";
+            CursorLoader cursorLoader = new CursorLoader(context,uri,VIDEO_COLUMNS,selection,selectionArgs,null);
             return cursorLoader;
         }
         return null;
@@ -46,12 +41,11 @@ public class ReviewsCallback implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Log.d("daf"," onLoadFinished called");
-        DetailActivityFragment.updateReviewAdapter(data);
+        DetailActivityFragment.updateVideoAdapter(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        DetailActivityFragment.updateReviewAdapter(null);
+        DetailActivityFragment.updateVideoAdapter(null);
     }
 }

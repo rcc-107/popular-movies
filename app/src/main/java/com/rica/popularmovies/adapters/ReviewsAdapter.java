@@ -43,13 +43,11 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHold
     public ReviewsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.review_layout,parent,false);
         ReviewsAdapter.ViewHolder viewHolder = new ReviewsAdapter.ViewHolder(view);
-        Log.d("daf","oncreateviewholder");
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Log.d("daf","obindviewholder");
         if(mCursor.moveToPosition(position)){
             holder.reviewAuthor.setText(mCursor.getString(REVIEW_AUTHOR));
             holder.reviewContent.setText(mCursor.getString(REVIEW_CONTENT));

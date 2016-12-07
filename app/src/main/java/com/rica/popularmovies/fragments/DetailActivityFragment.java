@@ -44,9 +44,11 @@ public class DetailActivityFragment extends Fragment {
     private final int LOAD_VIDEO = 1;
     private final int LOAD_REVIEWS = 2;
     private ReviewsCallback reviewsCallback;
+    privatr VideosCallback videosCallback;
     private RecyclerView reviewRV;
     private RecyclerView videoRV;
     private static ReviewsAdapter reviewsAdapter;
+    private static VideosAdapter videosAdapter;
 
     private static TextView title;
     private static TextView synopsis;
@@ -130,13 +132,20 @@ public class DetailActivityFragment extends Fragment {
         aca.setSupportActionBar(toolbar);
         aca.setTitle(null);
         aca.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        
+        videosAdapter = new VideosAdapter(mContext);
+        RecyclerView.LayoutManager videoLayout = new LinearLayoutManager(mContext, LinearLayout.VERTICAL,false);
+        videoRV.setLayoutManager(videoLayout);
+        videoRV.setAdapter(videosAdapter);
 
         reviewsAdapter = new ReviewsAdapter(mContext);
         RecyclerView.LayoutManager reviewLayout = new LinearLayoutManager(mContext,LinearLayoutManager.VERTICAL,false);
         reviewRV.setLayoutManager(reviewLayout);
         reviewRV.setAdapter(reviewsAdapter);
-
-        reviewsCallback = new ReviewsCallback(mContext,movieID,REVIEW_COLUMNS,reviewsAdapter);
+							
+							videosCallback = new VideosCallback(mContext,movieID,VIDEO_COLUMN);
+							
+        reviewsCallback = new ReviewsCallback(mContext,movieID,REVIEW_COLUMNS);
         getLoaderManager().initLoader(LOAD_REVIEWS,null,reviewsCallback);
     }
 
@@ -160,8 +169,12 @@ public class DetailActivityFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    public static void updateAdapter(Cursor cursor){
+    public static void updateReviewAdapter(Cursor cursor){
         reviewsAdapter.swapCursor(cursor);
+    }
+    
+    public static void updateVideoAdapter(Cursor cursor) {
+    				videosAdapter.swapCursor(cursor);
     }
 
 //    public static void loadMovieDetailsToUI(Cursor data){
