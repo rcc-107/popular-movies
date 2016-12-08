@@ -12,10 +12,10 @@ import android.util.Log;
 
 import com.rica.popularmovies.Utility;
 import com.rica.popularmovies.adapters.ReviewsAdapter;
-import com.rica.popularmovies.data.MovieContract.MovieReviews;
+import com.rica.popularmovies.data.MovieContract.MovieVideos;
 import com.rica.popularmovies.fragments.DetailActivityFragment;
 
-public class VideosCallback extends LoaderManaget.LoaderCallbacks<Cursor> {
+public class VideosCallback implements LoaderManager.LoaderCallbacks<Cursor> {
 			 private Context context;
     private Uri uri;
     private String[] VIDEO_COLUMNS;

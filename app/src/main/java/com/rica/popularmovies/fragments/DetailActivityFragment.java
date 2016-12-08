@@ -24,7 +24,9 @@ import com.rica.popularmovies.R;
 import com.rica.popularmovies.SettingsActivity;
 import com.rica.popularmovies.Utility;
 import com.rica.popularmovies.adapters.ReviewsAdapter;
+import com.rica.popularmovies.adapters.VideosAdapter;
 import com.rica.popularmovies.callbacks.ReviewsCallback;
+import com.rica.popularmovies.callbacks.VideosCallback;
 import com.rica.popularmovies.data.MovieContract.MovieEntry;
 import com.rica.popularmovies.data.MovieContract.MovieReviews;
 import com.rica.popularmovies.data.MovieContract.MovieVideos;
@@ -41,10 +43,10 @@ public class DetailActivityFragment extends Fragment {
     private String movieID;
 
     private final int LOAD_DETAILS = 0;
-    private final int LOAD_VIDEO = 1;
+    private final int LOAD_VIDEOS = 1;
     private final int LOAD_REVIEWS = 2;
     private ReviewsCallback reviewsCallback;
-    privatr VideosCallback videosCallback;
+    private VideosCallback videosCallback;
     private RecyclerView reviewRV;
     private RecyclerView videoRV;
     private static ReviewsAdapter reviewsAdapter;
@@ -134,7 +136,7 @@ public class DetailActivityFragment extends Fragment {
         aca.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
         videosAdapter = new VideosAdapter(mContext);
-        RecyclerView.LayoutManager videoLayout = new LinearLayoutManager(mContext, LinearLayout.VERTICAL,false);
+        RecyclerView.LayoutManager videoLayout = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL,false);
         videoRV.setLayoutManager(videoLayout);
         videoRV.setAdapter(videosAdapter);
 
@@ -143,7 +145,8 @@ public class DetailActivityFragment extends Fragment {
         reviewRV.setLayoutManager(reviewLayout);
         reviewRV.setAdapter(reviewsAdapter);
 							
-							videosCallback = new VideosCallback(mContext,movieID,VIDEO_COLUMN);
+							videosCallback = new VideosCallback(mContext,movieID,VIDEO_COLUMNS);
+							getLoaderManager().initLoader(LOAD_VIDEOS,null,videosCallback);
 							
         reviewsCallback = new ReviewsCallback(mContext,movieID,REVIEW_COLUMNS);
         getLoaderManager().initLoader(LOAD_REVIEWS,null,reviewsCallback);

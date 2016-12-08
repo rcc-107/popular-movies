@@ -4,6 +4,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.content.*;
+import android.database.*;
+import android.view.LayoutInflater;
+import com.rica.popularmovies.R;
 
 /**
  * Created by Rica on 12/2/2016.
@@ -31,8 +35,8 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder
 
     @Override
     public VideosAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = Inflater.from(mContext).inflate(R.layout.video_layout,parent,false);
-        VideoAdapter.ViewHolder viewholder = new VideoAdapter.ViewHolder(view);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.video_layout,parent,false);
+        VideosAdapter.ViewHolder viewholder = new VideosAdapter.ViewHolder(view);
         return viewholder;
     }
 
