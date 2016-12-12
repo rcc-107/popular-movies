@@ -25,6 +25,7 @@ import com.rica.popularmovies.SettingsActivity;
 import com.rica.popularmovies.Utility;
 import com.rica.popularmovies.adapters.ReviewsAdapter;
 import com.rica.popularmovies.adapters.VideosAdapter;
+import com.rica.popularmovies.callbacks.DetailsCallback;
 import com.rica.popularmovies.callbacks.ReviewsCallback;
 import com.rica.popularmovies.callbacks.VideosCallback;
 import com.rica.popularmovies.data.MovieContract.MovieEntry;
@@ -45,6 +46,7 @@ public class DetailActivityFragment extends Fragment {
     private final int LOAD_DETAILS = 0;
     private final int LOAD_VIDEOS = 1;
     private final int LOAD_REVIEWS = 2;
+    private DetailsCallback detailsCallback;
     private ReviewsCallback reviewsCallback;
     private VideosCallback videosCallback;
     private RecyclerView reviewRV;
@@ -119,7 +121,9 @@ public class DetailActivityFragment extends Fragment {
         poster = (ImageView) view.findViewById(R.id.moviePoster);
 
         reviewRV = (RecyclerView) view.findViewById(R.id.review_recyclerview);
+        reviewRV.setNestedScrollingEnabled(false);
         videoRV = (RecyclerView) view.findViewById(R.id.video_recyclerview);
+        videoRV.setNestedScrollingEnabled(false);
         return view;
     }
 
@@ -144,9 +148,12 @@ public class DetailActivityFragment extends Fragment {
         RecyclerView.LayoutManager reviewLayout = new LinearLayoutManager(mContext,LinearLayoutManager.VERTICAL,false);
         reviewRV.setLayoutManager(reviewLayout);
         reviewRV.setAdapter(reviewsAdapter);
-							
-							videosCallback = new VideosCallback(mContext,movieID,VIDEO_COLUMNS);
-							getLoaderManager().initLoader(LOAD_VIDEOS,null,videosCallback);
+
+        detailsCallback = new DetailsCallback(mContext,movieID,MOVIE_COLUMNS);
+        getLoaderManager().initLoader(LOAD_DETAILS,null,detailsCallback);
+
+		videosCallback = new VideosCallback(mContext,movieID,VIDEO_COLUMNS);
+		getLoaderManager().initLoader(LOAD_VIDEOS,null,videosCallback);
 							
         reviewsCallback = new ReviewsCallback(mContext,movieID,REVIEW_COLUMNS);
         getLoaderManager().initLoader(LOAD_REVIEWS,null,reviewsCallback);
@@ -180,102 +187,13 @@ public class DetailActivityFragment extends Fragment {
     				videosAdapter.swapCursor(cursor);
     }
 
-//    public static void loadMovieDetailsToUI(Cursor data){
-//        title.setText(data.getString(TITLE));
-//        synopsis.setText(data.getString(SYNOPSIS));
-//        release.setText(data.getString(RELEASE_DATE));
-//        popularity.setText(data.getString(POPULARITY));
-//        vote.setText(data.getString(VOTE_AVERAGE));
-//        Utility.setPoster(mContext,data.getString(BACKDROP),poster);
-//        final String id = data.getString(MOVIE_ID);
-//        for(int i=0; i<data.getCount(); i++) {
-//            if(data.getString(VIDEO_TITLE) != null) {
-//                TextView trailer_title = new TextView(mContext);
-//                trailer_title.setGravity(Gravity.VERTICAL_GRAVITY_MASK);
-//                trailer_title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.play, 0, 0, 0);
-//                trailer_title.setText(data.getString(VIDEO_TITLE));
-//                final String path = data.getString(VIDEO_PATH);
-//                trailer_title.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        Uri uri = Uri.parse("https://www.youtube.com/watch?v=").buildUpon().appendPath(path).build();
-//                        Intent intent = new Intent(Intent.ACTION_VIEW);
-//                        intent.setData(uri);
-//
-//                        if (intent.resolveActivity(mContext.getPackageManager()) != null) {
-//                            mContext.startActivity(intent);
-//                        }
-//                    }
-//                });
-//                trailer_container.addView(trailer_title);
-//            }
-//            data.moveToNext();
-//        }
-//    }
-
-/*    public void loadDetailsToUI(int flag){
-        Uri uri;
-        String selection;
-        final Cursor cursor;
-        switch(flag) {
-           case LOAD_VIDEO:
-               uri = ContentUris.withAppendedId(MovieVideos.CONTENT_URI, Long.parseLong(movieID));
-               selection = MovieVideos.MOVIE_ID + " = ? ";
-               String[] vidSelectionArgs = {movieID};
-
-               cursor = mContext.getContentResolver().query(uri, VIDEO_COLUMNS, selection, vidSelectionArgs, null);
-
-               String[] vidColumns = {MovieVideos.VIDEO_TITLE};
-               int[] vidTo = {R.id.video_title};
-               SimpleCursorAdapter scAdapter1 = new SimpleCursorAdapter(mContext, R.layout.video_layout, cursor, vidColumns, vidTo, 1);
-
-               videoListview.setAdapter(scAdapter1);
-               videoListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                   @Override
-                   public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                       cursor.moveToPosition(position);
-                       Uri uri = Uri.parse("https://www.youtube.com/watch?v=").buildUpon().appendPath(cursor.getString(VIDEO_PATH)).build();
-                       Intent intent = new Intent(Intent.ACTION_VIEW);
-                       intent.setData(uri);
-
-                       if (intent.resolveActivity(mContext.getPackageManager()) != null) {
-                           mContext.startActivity(intent);
-                       }
-                   }
-               });
-               break;
-           case LOAD_REVIEWS:
-               uri = ContentUris.withAppendedId(MovieReviews.CONTENT_URI, Long.parseLong(movieID));
-               selection = MovieReviews.MOVIE_ID + " = ? ";
-               String[] revSelectionArgs = {movieID};
-
-               cursor = mContext.getContentResolver().query(uri, REVIEW_COLUMNS, selection, revSelectionArgs, null);
-
-               String[] revColumns = {MovieReviews.REVIEW_AUTHOR, MovieReviews.REVIEW_CONTENT};
-               int[] revTo = {R.id.review_author, R.id.review_content};
-               SimpleCursorAdapter scAdapter2 = new SimpleCursorAdapter(mContext, R.layout.review_layout, cursor, revColumns, revTo, 1);
-
-               reviewListview.setAdapter(scAdapter2);
-               break;
-       }
-    }*/
-
-    /*public class FetchReviews extends AsyncTask<String,Cursor,Cursor> {
-        @Override
-        protected Cursor doInBackground(String... params) {
-            Uri uri = ContentUris.withAppendedId(MovieReviews.CONTENT_URI, Long.parseLong(movieID));
-            String selection = MovieReviews.MOVIE_ID + " = ? ";
-            String[] revSelectionArgs = {movieID};
-
-            Cursor cursor = mContext.getContentResolver().query(uri, REVIEW_COLUMNS, selection, revSelectionArgs, null);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Cursor cursor) {
-            reviewsAdapter.swapCursor(cursor);
-        }
-    }*/
-
+    public static void loadMovieDetailsToUI(Cursor data){
+        title.setText(data.getString(TITLE));
+        synopsis.setText(data.getString(SYNOPSIS));
+        release.setText(data.getString(RELEASE_DATE));
+        popularity.setText(data.getString(POPULARITY));
+        vote.setText(data.getString(VOTE_AVERAGE));
+        Utility.setPoster(mContext,data.getString(BACKDROP),poster);
+    }
 
 }
