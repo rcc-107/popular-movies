@@ -36,7 +36,7 @@ import com.rica.popularmovies.data.MovieContract.MovieVideos;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailActivityFragment extends Fragment {
+public class DetailActivityFragment extends Fragment implements VideosAdapter.VideoClickListener {
 
     public static final String MOVIE_URI = "movie_uri";
     private static Context mContext;
@@ -139,7 +139,7 @@ public class DetailActivityFragment extends Fragment {
         aca.setTitle(null);
         aca.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
-        videosAdapter = new VideosAdapter(mContext);
+        videosAdapter = new VideosAdapter(mContext,this);
         RecyclerView.LayoutManager videoLayout = new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL,false);
         videoRV.setLayoutManager(videoLayout);
         videoRV.setAdapter(videosAdapter);
@@ -194,6 +194,22 @@ public class DetailActivityFragment extends Fragment {
         popularity.setText(data.getString(POPULARITY));
         vote.setText(data.getString(VOTE_AVERAGE));
         Utility.setPoster(mContext,data.getString(BACKDROP),poster);
+    }
+
+    @Override
+    public void itemClick(View v, int position) {
+        Cursor cursor = videosCallback.getCursor();
+        if(cursor != null) {
+            if (cursor.moveToPosition(position)) {
+                Uri uri = Uri.parse("https://www.youtube.com/watch?v=").buildUpon().appendPath(cursor.getString(VIDEO_PATH)).build();
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(uri);
+
+                if (intent.resolveActivity(mContext.getPackageManager()) != null) {
+                    mContext.startActivity(intent);
+                }
+            }
+        }
     }
 
 }

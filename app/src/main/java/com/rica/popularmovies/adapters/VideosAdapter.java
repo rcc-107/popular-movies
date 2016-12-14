@@ -14,23 +14,35 @@ import com.rica.popularmovies.R;
  */
 
 public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.ViewHolder>{
-				private Context mContext;
-				private Cursor mCursor;
+    private Context mContext;
+    private Cursor mCursor;
+    private static VideoClickListener videoClickListener;
 				
-				static final int VIDEO_TITLE = 1;
-    	static final int VIDEO_PATH = 2;
+    static final int VIDEO_TITLE = 1;
+    static final int VIDEO_PATH = 2;
     
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView videoTitle;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
             videoTitle = (TextView) itemView;
         }
+
+        @Override
+        public void onClick(View v) {
+            videoClickListener.itemClick(v,this.getAdapterPosition());
+        }
+    }
+
+    public interface VideoClickListener {
+        void itemClick(View v, int position);
     }
     
-    public VideosAdapter(Context context) {
-    				mContext = context;
+    public VideosAdapter(Context context, VideoClickListener vcl) {
+        mContext = context;
+        this.videoClickListener = vcl;
     }
 
     @Override
