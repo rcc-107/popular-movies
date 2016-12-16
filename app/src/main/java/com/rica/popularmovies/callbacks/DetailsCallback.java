@@ -32,9 +32,8 @@ public class DetailsCallback implements LoaderManager.LoaderCallbacks<Cursor> {
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         if(uri != null){
             String movieID = Utility.getIDFromUri(uri);
-            String selection;
             String[] selectionArgs = {movieID};
-            selection = MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.MOVIE_ID + " = ? ";
+            String selection = MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.MOVIE_ID + " = ? ";
             return new CursorLoader(context,uri,MOVIE_COLUMNS,selection,selectionArgs,null);
         }
         return null;

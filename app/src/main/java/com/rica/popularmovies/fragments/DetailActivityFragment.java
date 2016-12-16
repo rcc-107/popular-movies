@@ -1,11 +1,15 @@
 package com.rica.popularmovies.fragments;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,6 +32,7 @@ import com.rica.popularmovies.adapters.VideosAdapter;
 import com.rica.popularmovies.callbacks.DetailsCallback;
 import com.rica.popularmovies.callbacks.ReviewsCallback;
 import com.rica.popularmovies.callbacks.VideosCallback;
+import com.rica.popularmovies.data.MovieContract;
 import com.rica.popularmovies.data.MovieContract.MovieEntry;
 import com.rica.popularmovies.data.MovieContract.MovieReviews;
 import com.rica.popularmovies.data.MovieContract.MovieVideos;
@@ -36,7 +41,7 @@ import com.rica.popularmovies.data.MovieContract.MovieVideos;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailActivityFragment extends Fragment implements VideosAdapter.VideoClickListener {
+public class DetailActivityFragment extends Fragment implements VideosAdapter.VideoClickListener,View.OnClickListener {
 
     public static final String MOVIE_URI = "movie_uri";
     private static Context mContext;
@@ -60,6 +65,7 @@ public class DetailActivityFragment extends Fragment implements VideosAdapter.Vi
     private static TextView popularity;
     private static TextView vote;
     private static ImageView poster;
+    private static FloatingActionButton favorite;
 
     private final String[] MOVIE_COLUMNS = {
             MovieEntry.TITLE,
@@ -71,6 +77,7 @@ public class DetailActivityFragment extends Fragment implements VideosAdapter.Vi
             MovieEntry.RELEASE_DATE,
             MovieEntry.BACKDROP_PATH,
             MovieEntry.DATE_ADDED,
+            MovieEntry.FAVORITES
     };
 
     private final String[] VIDEO_COLUMNS = {
@@ -95,6 +102,7 @@ public class DetailActivityFragment extends Fragment implements VideosAdapter.Vi
     static final int RELEASE_DATE = 6;
     static final int BACKDROP = 7;
     static final int DATE_ADDED = 8;
+    static final int FAVORITES = 9;
 
     static final int VIDEO_TITLE = 1;
     static final int VIDEO_PATH = 2;
@@ -119,6 +127,8 @@ public class DetailActivityFragment extends Fragment implements VideosAdapter.Vi
         popularity = (TextView) view.findViewById(R.id.moviePopularity);
         vote = (TextView) view.findViewById(R.id.movieVote);
         poster = (ImageView) view.findViewById(R.id.moviePoster);
+        favorite = (FloatingActionButton) view.findViewById(R.id.faveButton);
+        favorite.setOnClickListener(this);
 
         reviewRV = (RecyclerView) view.findViewById(R.id.review_recyclerview);
         reviewRV.setNestedScrollingEnabled(false);
@@ -194,6 +204,16 @@ public class DetailActivityFragment extends Fragment implements VideosAdapter.Vi
         popularity.setText(data.getString(POPULARITY));
         vote.setText(data.getString(VOTE_AVERAGE));
         Utility.setPoster(mContext,data.getString(BACKDROP),poster);
+        Drawable drawable;
+        if(data.getInt(FAVORITES) == 1) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                drawable = mContext.getResources().getDrawable(R.drawable.favorite_pink, null);
+            }else{
+                drawable = mContext.getResources().getDrawable(R.drawable.favorite_pink);
+            }
+            favorite.setImageDrawable(drawable);
+        }
+
     }
 
     @Override
@@ -212,4 +232,23 @@ public class DetailActivityFragment extends Fragment implements VideosAdapter.Vi
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        Uri uri = MovieEntry.buildMovieUriWithFavorites();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MovieEntry.FAVORITES,1);
+        String[] selectionArgs = {movieID};
+        String selection = MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.MOVIE_ID + " = ? ";
+
+        int affectedRows = mContext.getContentResolver().update(uri,contentValues,selection,selectionArgs);
+        if(affectedRows > 0){
+            Drawable pink;
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                pink = mContext.getResources().getDrawable(R.drawable.favorite_pink, null);
+            }else{
+                pink = mContext.getResources().getDrawable(R.drawable.favorite_pink);
+            }
+            favorite.setImageDrawable(pink);
+        }
+    }
 }

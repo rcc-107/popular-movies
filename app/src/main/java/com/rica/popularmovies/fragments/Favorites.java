@@ -12,7 +12,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,8 +112,7 @@ public class Favorites extends Fragment implements LoaderManager.LoaderCallbacks
         String sort = sp.getString(getString(R.string.pref_sort_key), MovieEntry.POPULARITY)+" Desc";
         Uri moviesUri = MovieEntry.buildMovieUriWithFavorites();
         String selection = MovieEntry.FAVORITES + " = ? ";
-        String[] selectionArgs = {"TRUE"};
-        Log.d("fav Uri", moviesUri.toString());
+        String[] selectionArgs = {"1"};
         return new CursorLoader(getContext(),moviesUri,Movie_Colums,selection,selectionArgs,sort);
     }
 

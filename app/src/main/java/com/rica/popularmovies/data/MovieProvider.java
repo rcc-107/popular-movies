@@ -140,7 +140,17 @@ public class MovieProvider extends ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
-        return 0;
+        final SQLiteDatabase db = movieDBHelper.getWritableDatabase();
+        final int matcher = mUriMatcher.match(uri);
+
+        switch(matcher) {
+            case MOVIE_FAVORITES:
+                int affectedRows = db.update(MovieEntry.TABLE_NAME,contentValues,s,strings);
+                getContext().getContentResolver().notifyChange(uri,null);
+                return affectedRows;
+            default:
+                return 0;
+        }
     }
 
     @Override
