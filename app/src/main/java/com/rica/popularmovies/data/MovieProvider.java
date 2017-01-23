@@ -31,6 +31,7 @@ public class MovieProvider extends ContentProvider {
     private static final int VIDEOS = 106;
     private static final int REVIEWS = 107;
     private static final int MOVIE_FAVORITES = 108;
+    private static final int MOVIE_SEARCH = 109;
 
 
 
@@ -47,6 +48,9 @@ public class MovieProvider extends ContentProvider {
         SQLiteDatabase db = movieDBHelper.getReadableDatabase();
         final int matcher = mUriMatcher.match(uri);
         switch(matcher){
+            case MOVIES:
+                returnCursor = db.query(MovieEntry.TABLE_NAME,projection,selection,selectArgs,null,null,sort);
+                break;
             case MOVIE_FAVORITES:
                 returnCursor = db.query(MovieEntry.TABLE_NAME,projection,selection,selectArgs,null,null,sort);
                 break;

@@ -67,7 +67,7 @@ public class DetailActivityFragment extends Fragment implements VideosAdapter.Vi
     private static ImageView poster;
     private static FloatingActionButton favorite;
 
-    private final String[] MOVIE_COLUMNS = {
+    public static final String[] MOVIE_COLUMNS = {
             MovieEntry.TITLE,
             MovieEntry.TABLE_NAME+"."+MovieEntry.MOVIE_ID,
             MovieEntry.SYNOPSIS,

@@ -58,6 +58,7 @@ public class MovieContract {
         public static Uri buildMovieUriWithFavorites() {
             return CONTENT_URI.buildUpon().appendPath(FAVORITES).build();
         }
+
     }
 
     public static final class MovieVideos implements BaseColumns {
