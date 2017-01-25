@@ -44,6 +44,7 @@ public class Utility {
         });
     }
 
+
     public static String getIDFromUri(Uri uri) {
         return uri.getPathSegments().get(1);
     }

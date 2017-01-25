@@ -101,7 +101,7 @@ public class Favorites extends Fragment implements LoaderManager.LoaderCallbacks
     public void itemClicked(View v, int position) {
         if(!cursor.isClosed()) {
             if (cursor.moveToPosition(position)) {
-                ((MainActivityFragment.Callback) getActivity()).onItemClicked(MovieEntry.buildMovieUriWithMovieID(cursor.getInt(MOVIE_ID)));
+                ((MainActivityFragment.Callback) getActivity()).onItemClicked(MovieEntry.buildMovieUriWithMovieID(cursor.getInt(MOVIE_ID)),v);
             }
         }
     }

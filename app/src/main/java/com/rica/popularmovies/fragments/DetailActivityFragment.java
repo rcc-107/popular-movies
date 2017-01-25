@@ -65,6 +65,7 @@ public class DetailActivityFragment extends Fragment implements VideosAdapter.Vi
     private static TextView popularity;
     private static TextView vote;
     private static ImageView poster;
+    private static ImageView movieImg;
     private static FloatingActionButton favorite;
 
     public static final String[] MOVIE_COLUMNS = {
@@ -127,6 +128,7 @@ public class DetailActivityFragment extends Fragment implements VideosAdapter.Vi
         popularity = (TextView) view.findViewById(R.id.moviePopularity);
         vote = (TextView) view.findViewById(R.id.movieVote);
         poster = (ImageView) view.findViewById(R.id.moviePoster);
+        movieImg = (ImageView) view.findViewById(R.id.imageView);
         favorite = (FloatingActionButton) view.findViewById(R.id.faveButton);
         favorite.setOnClickListener(this);
 
@@ -203,6 +205,7 @@ public class DetailActivityFragment extends Fragment implements VideosAdapter.Vi
         release.setText(data.getString(RELEASE_DATE));
         popularity.setText(data.getString(POPULARITY));
         vote.setText(data.getString(VOTE_AVERAGE));
+        Utility.setPoster(mContext,data.getString(POSTER_PATH),movieImg);
         Utility.setPoster(mContext,data.getString(BACKDROP),poster);
         Drawable drawable;
         if(data.getInt(FAVORITES) == 1) {

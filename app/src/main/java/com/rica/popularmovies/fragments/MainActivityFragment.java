@@ -100,13 +100,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public void itemClicked(View v, int position) {
         if(!cursor.isClosed()) {
             if (cursor.moveToPosition(position)) {
-                ((Callback) getActivity()).onItemClicked(MovieEntry.buildMovieUriWithMovieID(cursor.getInt(MOVIE_ID)));
+                ((Callback) getActivity()).onItemClicked(MovieEntry.buildMovieUriWithMovieID(cursor.getInt(MOVIE_ID)),v);
             }
         }
     }
 
     public interface Callback {
-        void onItemClicked(Uri movieID);
+        void onItemClicked(Uri movieID, View view);
     }
 
     @Override
