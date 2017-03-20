@@ -95,7 +95,7 @@ public class DetailActivityFragment extends Fragment implements VideosAdapter.Vi
     };
 
     static final int TITLE = 0;
-    static final int MOVIE_ID = 1;
+    public static final int MOVIE_ID = 1;
     static final int SYNOPSIS = 2;
     static final int POSTER_PATH = 3;
     static final int POPULARITY = 4;
