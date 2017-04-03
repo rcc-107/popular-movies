@@ -15,21 +15,25 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.rica.popularmovies.R;
 import com.rica.popularmovies.SettingsActivity;
+import com.rica.popularmovies.Utility;
 import com.rica.popularmovies.adapters.RecyclerViewAdapter;
 import com.rica.popularmovies.data.MovieContract.MovieEntry;
+import com.rica.popularmovies.sync.MovieSyncAdapter;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, RecyclerViewAdapter.ItemClickListener {
+public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, RecyclerViewAdapter.ItemClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private Cursor cursor;
     public static RecyclerViewAdapter rvAdapter;
+    private static TextView emptyview;
     private static final int GRID_NUM_COUNT = 3;
     private static final int LOADER_ID = 1;
 
@@ -72,6 +76,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         rvAdapter = new RecyclerViewAdapter(getContext(), this);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
+        emptyview = (TextView) view.findViewById(R.id.emptyview);
         layoutManager = new GridLayoutManager(getActivity(),GRID_NUM_COUNT);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(rvAdapter);
@@ -86,10 +91,19 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onResume() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        sp.registerOnSharedPreferenceChangeListener(this);
         super.onResume();
         if(SettingsActivity.sortOrder){
-           updateList();
+            updateList();
         }
+    }
+
+    @Override
+    public void onPause() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
+        sp.registerOnSharedPreferenceChangeListener(this);
+        super.onPause();
     }
 
     public void updateList(){
@@ -102,6 +116,13 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             if (cursor.moveToPosition(position)) {
                 ((Callback) getActivity()).onItemClicked(MovieEntry.buildMovieUriWithMovieID(cursor.getInt(MOVIE_ID)),v);
             }
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals(R.string.pref_movie_status_key)){
+            updateEmptyView();
         }
     }
 
@@ -127,12 +148,36 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
        rvAdapter.swapCursor(data);
-       cursor = data;
+        cursor = data;
+        if(cursor.getCount() > 0){
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyview.setVisibility(View.GONE);
+        }else{
+            updateEmptyView();
+            recyclerView.setVisibility(View.GONE);
+            emptyview.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         rvAdapter.swapCursor(null);
+    }
+
+    private void updateEmptyView() {
+        @MovieSyncAdapter.LocationStatus int locationStatus = Utility.getLocationStatus(getContext());
+        switch(locationStatus){
+            case MovieSyncAdapter.MOVIE_STATUS_SERVER_DOWN:
+                emptyview.setText(R.string.empty_movie_list_server_down);
+                break;
+            case MovieSyncAdapter.MOVIE_STATUS_SERVER_INVALID:
+                emptyview.setText(R.string.empty_movie_list_server_error);
+                break;
+            default:
+                if(!Utility.isNetworkAvailable(getContext())){
+                    emptyview.setText(R.string.empty_database);
+                }
+        }
     }
 
 }

@@ -1,9 +1,14 @@
 package com.rica.popularmovies;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.widget.ImageView;
 
+import com.rica.popularmovies.sync.MovieSyncAdapter;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -47,5 +52,17 @@ public class Utility {
 
     public static String getIDFromUri(Uri uri) {
         return uri.getPathSegments().get(1);
+    }
+
+    public static Boolean isNetworkAvailable(Context c){
+        ConnectivityManager cm = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    @SuppressWarnings("ResourceType")
+    public static @MovieSyncAdapter.LocationStatus int getLocationStatus(Context context) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        return sp.getInt(context.getString(R.string.pref_movie_status_key),MovieSyncAdapter.MOVIE_STATUS_UNKNOWN);
     }
 }

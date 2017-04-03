@@ -7,9 +7,14 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.util.Log;
 
 import com.rica.popularmovies.R;
@@ -26,6 +31,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -45,6 +52,17 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int SYNC_INTERVAL = 30;
     private static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
     private static final String MOVIE_ID = "movieID";
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({MOVIE_STATUS_OK,MOVIE_STATUS_SERVER_DOWN, MOVIE_STATUS_SERVER_INVALID,  MOVIE_STATUS_UNKNOWN})
+    public @interface LocationStatus{}
+
+    public static final int MOVIE_STATUS_OK = 0;
+    public static final int MOVIE_STATUS_SERVER_DOWN = 1;
+    public static final int
+            MOVIE_STATUS_SERVER_INVALID = 2;
+    public static final int
+            MOVIE_STATUS_UNKNOWN = 3;
 
     public enum Options{
         LIST,VIDEOS,REVIEWS
@@ -80,12 +98,12 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private static void onAccountCreated(Account account, Context context) {
-//        configurePeriodicSync(context,SYNC_INTERVAL,SYNC_FLEXTIME);
+        configurePeriodicSync(context,SYNC_INTERVAL,SYNC_FLEXTIME);
         ContentResolver.setSyncAutomatically(account,context.getString(R.string.authority),false);
         syncImmediately(context);
     }
 
- /*   private static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
+    private static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
         Account account = getSyncAccount(context);
         String authority = context.getString(R.string.authority);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
@@ -96,7 +114,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         }else{
             ContentResolver.addPeriodicSync(account,authority,new Bundle(),syncInterval);
         }
-    }*/
+    }
 
     @Override
     public void onPerformSync(Account account, Bundle bundle, String s, ContentProviderClient contentProviderClient, SyncResult syncResult) {
@@ -124,6 +142,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                         stringBuffer.append(line + "\n");
                     }
                     if (stringBuffer.length() == 0) {
+                        setLocationStatus(context,MOVIE_STATUS_SERVER_DOWN);
                         return;
                     }
                     getVideoDataFromJSON(stringBuffer.toString());
@@ -154,7 +173,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                     getReviewsDataFromJSON(stringBuffer.toString());
                 }
             }else{
-                Uri uri = Uri.parse("https://api.themoviedb.org/3/discover/movie").buildUpon()
+                Uri uri = Uri.parse("http://www.google.com?").buildUpon()
                         .appendQueryParameter("sort_by", this.context.getString(R.string.popularity))
                         .appendQueryParameter("api_key","62e177741ae6467e6af95e2c21d57c6e").build();
                 URL url = new URL(uri.toString());
@@ -177,7 +196,8 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
                 getMovieDataFromJSON(stringBuffer.toString());
             }
-        }catch (IOException e){
+        }catch (IOException e) {
+            setLocationStatus(context, MOVIE_STATUS_SERVER_DOWN);
             Log.e("IOException", "Error ", e);
         }finally {
             if(httpURLConnection != null){
@@ -243,8 +263,10 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 ContentValues[] cvArray = new ContentValues[movieVector.size()];
                 movieVector.toArray(cvArray);
                 this.context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI,cvArray);
+                setLocationStatus(context, MOVIE_STATUS_OK);
             }
         } catch (JSONException e) {
+            setLocationStatus(context, MOVIE_STATUS_SERVER_INVALID);
             e.printStackTrace();
         }
         fetch = Options.VIDEOS;
@@ -280,8 +302,10 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 ContentValues[] cvArray = new ContentValues[vector.size()];
                 vector.toArray(cvArray);
                 this.context.getContentResolver().bulkInsert(MovieVideos.CONTENT_URI,cvArray);
+                setLocationStatus(context, MOVIE_STATUS_OK);
             }
         } catch (JSONException e) {
+            setLocationStatus(context, MOVIE_STATUS_SERVER_INVALID);
             e.printStackTrace();
         }
         fetch = Options.REVIEWS;
@@ -316,11 +340,20 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 ContentValues[] cvArray = new ContentValues[vector.size()];
                 vector.toArray(cvArray);
                 this.context.getContentResolver().bulkInsert(MovieReviews.CONTENT_URI,cvArray);
+                setLocationStatus(context, MOVIE_STATUS_OK);
             }
         } catch (JSONException e) {
+            setLocationStatus(context, MOVIE_STATUS_SERVER_INVALID);
             e.printStackTrace();
         }
         fetch = Options.LIST;
+    }
+
+    static private void setLocationStatus(Context context, @LocationStatus int locationStatus) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor spe = sp.edit();
+        spe.putInt(context.getString(R.string.pref_movie_status_key),locationStatus);
+        spe.commit();
     }
 
 }

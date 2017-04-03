@@ -29,4 +29,11 @@
 
     <string name="search_hint">Search movies</string>
     <string name="title_activity_search">SearchActivity</string>
+
+    <string name="empty_database">No Data Available</string>
+    <string name="no_network">No Data Available. Network is not available</string>
+    
+    <string name="pref_movie_status_key">loc-status</string>
+    <string name="empty_movie_list_server_down">No weather information available. The server is not returning data.</string>
+    <string name="empty_movie_list_server_error">No weather information available. The server is not returning a valid data.</string>
 </resources>
