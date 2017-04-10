@@ -8,10 +8,8 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.IntDef;
@@ -52,6 +50,9 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int SYNC_INTERVAL = 30;
     private static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
     private static final String MOVIE_ID = "movieID";
+    private int page = 1;
+    private int totalPages;
+    private int pageToPreload = 4;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({MOVIE_STATUS_OK,MOVIE_STATUS_SERVER_DOWN, MOVIE_STATUS_SERVER_INVALID,  MOVIE_STATUS_UNKNOWN})
@@ -98,12 +99,12 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     private static void onAccountCreated(Account account, Context context) {
-        configurePeriodicSync(context,SYNC_INTERVAL,SYNC_FLEXTIME);
+//        configurePeriodicSync(context,SYNC_INTERVAL,SYNC_FLEXTIME);
         ContentResolver.setSyncAutomatically(account,context.getString(R.string.authority),false);
         syncImmediately(context);
     }
 
-    private static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
+    /*private static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
         Account account = getSyncAccount(context);
         String authority = context.getString(R.string.authority);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
@@ -114,12 +115,14 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         }else{
             ContentResolver.addPeriodicSync(account,authority,new Bundle(),syncInterval);
         }
-    }
+    }*/
 
     @Override
     public void onPerformSync(Account account, Bundle bundle, String s, ContentProviderClient contentProviderClient, SyncResult syncResult) {
         HttpURLConnection httpURLConnection = null;
         BufferedReader bufferedReader = null;
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        String lang = sp.getString(context.getString(R.string.pref_lang_key),context.getString(R.string.pref_lang_defValue));
         try{
             if(fetch == Options.VIDEOS) {
                 for (int i = 0; i < movieIDList.size(); i++) {
@@ -173,9 +176,11 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                     getReviewsDataFromJSON(stringBuffer.toString());
                 }
             }else{
-                Uri uri = Uri.parse("http://www.google.com?").buildUpon()
-                        .appendQueryParameter("sort_by", this.context.getString(R.string.popularity))
-                        .appendQueryParameter("api_key","62e177741ae6467e6af95e2c21d57c6e").build();
+                Uri uri = Uri.parse("https://api.themoviedb.org/3/discover/movie").buildUpon()
+                        .appendQueryParameter("sort_by", "popularity.desc")
+                        .appendQueryParameter("api_key","62e177741ae6467e6af95e2c21d57c6e")
+                        .appendQueryParameter("page",Integer.toString(page))
+                        .appendQueryParameter("language", lang).build();
                 URL url = new URL(uri.toString());
                 httpURLConnection = (HttpURLConnection) url.openConnection();
                 httpURLConnection.setRequestMethod("GET");
@@ -195,6 +200,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                     return;
                 }
                 getMovieDataFromJSON(stringBuffer.toString());
+                Log.d("syncagain","fetched data: "+stringBuffer.toString()+" \n");
             }
         }catch (IOException e) {
             setLocationStatus(context, MOVIE_STATUS_SERVER_DOWN);
@@ -210,6 +216,14 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                     Log.e("PlaceholderFragment", "Error closing stream", e);
                 }
             }
+        }
+
+        if(page < pageToPreload && fetch == Options.LIST) {
+            page++;
+            Log.d("syncagain","page:"+Integer.toString(page)+" ptp:"+Integer.toString(pageToPreload));
+            syncImmediately(this.context);
+        }else{
+            syncImmediately(this.context);
         }
     }
 
@@ -228,6 +242,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
 
         try{
             JSONObject movieJSON = new JSONObject(movieJSONStr);
+            totalPages = movieJSON.getInt("total_pages");
             JSONArray resultsJA = movieJSON.getJSONArray(TMDB_RESULTS);
 
             Vector<ContentValues> movieVector = new Vector<>(resultsJA.length());
@@ -270,7 +285,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
             e.printStackTrace();
         }
         fetch = Options.VIDEOS;
-        syncImmediately(this.context);
 
     }
 
@@ -309,7 +323,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
             e.printStackTrace();
         }
         fetch = Options.REVIEWS;
-        syncImmediately(this.context);
     }
 
     private void getReviewsDataFromJSON(String movieJSONStr) {

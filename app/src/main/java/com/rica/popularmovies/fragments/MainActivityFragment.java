@@ -121,8 +121,10 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(key.equals(R.string.pref_movie_status_key)){
+        if(key.equals(R.string.pref_movie_status_key)) {
             updateEmptyView();
+        }else if(key.equals(R.string.pref_sort_key)) {
+            updateList();
         }
     }
 
@@ -133,21 +135,24 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String sort = sp.getString(getString(R.string.pref_sort_key),MovieEntry.POPULARITY)+" Desc";
-        Uri moviesUri;
+        String sort = sp.getString(getString(R.string.pref_sort_key),MovieEntry.RELEASE_DATE);
+        String sortOrder;
+        Uri moviesUri = MovieEntry.buildMovieListUri();
 
         if(getString(R.string.popularity)==sort) {
-            moviesUri = MovieEntry.buildMovieUriSortByPopularity();
-        }else /*if(getString(R.string.vote_desc).equals(sort))*/{
-            moviesUri = MovieEntry.buildMovieUriSortByVote();
+            sortOrder = MovieEntry.POPULARITY+" DESC";
+        }else if(getString(R.string.vote)==sort){
+            sortOrder = MovieEntry.VOTE_AVERAGE+" DESC";
+        }else{
+            sortOrder = MovieEntry.RELEASE_DATE+" DESC";
         }
 
-        return new CursorLoader(getContext(),moviesUri,Movie_Colums,null,null,sort);
+        return new CursorLoader(getContext(),moviesUri,Movie_Colums,null,null,sortOrder);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-       rvAdapter.swapCursor(data);
+        rvAdapter.swapCursor(data);
         cursor = data;
         if(cursor.getCount() > 0){
             recyclerView.setVisibility(View.VISIBLE);

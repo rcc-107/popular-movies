@@ -27,12 +27,12 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 MovieEntry.MOVIE_ID + " INTEGER NOT NULL UNIQUE," +
                 MovieEntry.TITLE + " TEXT NOT NULL," +
-                MovieEntry.RELEASE_DATE + " INTEGER NOT NULL," +
-                MovieEntry.SYNOPSIS + " TEXT NOT NULL," +
-                MovieEntry.POPULARITY + " INTEGER NOT NULL," +
-                MovieEntry.VOTE_AVERAGE + " INTEGER NOT NULL," +
-                MovieEntry.POSTER_PATH + " TEXT NOT NULL," +
-                MovieEntry.BACKDROP_PATH + " TEXT NOT NULL," +
+                MovieEntry.RELEASE_DATE + " INTEGER," +
+                MovieEntry.SYNOPSIS + " TEXT," +
+                MovieEntry.POPULARITY + " INTEGER," +
+                MovieEntry.VOTE_AVERAGE + " INTEGER," +
+                MovieEntry.POSTER_PATH + " TEXT," +
+                MovieEntry.BACKDROP_PATH + " TEXT," +
                 MovieEntry.FAVORITES + " INTEGER NOT NULL DEFAULT 0," +
                 MovieEntry.DATE_ADDED + " INTEGER NOT NULL);";
 
@@ -40,7 +40,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 MovieVideos._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"+
                 MovieVideos.VIDEO_ID + " TEXT,"+
                 MovieVideos.VIDEO_TITLE + " TEXT,"+
-                MovieVideos.VIDEO_PATH + " TEXT,"+
+                MovieVideos.VIDEO_PATH + " TEXT NOT NULL UNIQUE,"+
                 MovieVideos.MOVIE_ID + " TEXT,"+
                 " FOREIGN KEY("+ MovieVideos.MOVIE_ID+")"+" REFERENCES "+
                 MovieEntry.TABLE_NAME+"("+MovieEntry.MOVIE_ID+"));";
@@ -49,7 +49,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 MovieReviews._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"+
                 MovieReviews.REVIEW_ID + " TEXT,"+
                 MovieReviews.REVIEW_AUTHOR + " TEXT,"+
-                MovieReviews.REVIEW_CONTENT + " TEXT,"+
+                MovieReviews.REVIEW_CONTENT + " TEXT NOT NULL UNIQUE,"+
                 MovieReviews.MOVIE_ID + " TEXT,"+
                 " FOREIGN KEY("+ MovieReviews.MOVIE_ID+")"+" REFERENCES "+
                 MovieEntry.TABLE_NAME+"("+MovieEntry.MOVIE_ID+"));";

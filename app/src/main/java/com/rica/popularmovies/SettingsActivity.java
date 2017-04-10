@@ -2,9 +2,10 @@ package com.rica.popularmovies;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.rica.popularmovies.fragments.Favorites;
@@ -45,10 +46,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 
     public static class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+        private ListPreference lp;
+        private EditTextPreference etp;
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_general);
+            lp = (ListPreference) findPreference((getString(R.string.pref_sort_key)));
+            lp.setSummary(lp.getValue());
+            etp = (EditTextPreference) findPreference(getString(R.string.pref_lang_key));
+            etp.setSummary(etp.getText());
         }
 
         @Override
@@ -64,10 +73,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
 
         @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-            Log.d("SharedPreferenceChanged"," executed");
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             MainActivityFragment.rvAdapter.notifyDataSetChanged();
             Favorites.rvAdapter.notifyDataSetChanged();
+            if(key.equals(getString(R.string.pref_lang_key))) {
+                etp.setSummary(etp.getText());
+            }else if(key.equals(getString(R.string.pref_sort_key))) {
+                lp.setSummary(lp.getValue());
+            }
             sortOrder = true;
         }
     }

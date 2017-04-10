@@ -43,12 +43,8 @@ public class MovieContract {
             return CONTENT_URI.buildUpon().appendPath("date").appendPath(Long.toString(Utility.normalizeDate(date))).build();
         }*/
 
-        public static Uri buildMovieUriSortByPopularity() {
-            return CONTENT_URI.buildUpon().appendPath(POPULARITY).build();
-        }
-
-        public static Uri buildMovieUriSortByVote() {
-            return CONTENT_URI.buildUpon().appendPath(VOTE_AVERAGE).build();
+        public static Uri buildMovieListUri() {
+            return CONTENT_URI.buildUpon().appendPath(PATH_MOVIES).build();
         }
 
         public static Uri buildMovieUriWithMovieID(int movieID) {

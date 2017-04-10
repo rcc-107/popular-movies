@@ -22,8 +22,6 @@ public class MovieProvider extends ContentProvider {
     private MovieDBHelper movieDBHelper;
     private static final UriMatcher mUriMatcher = buildUriMatcher();
 
-    private static final int MOVIE_SORT_POPULARITY = 100;
-    private static final int MOVIE_SORT_VOTE = 101;
     private static final int MOVIE_WITH_ID = 102;
     private static final int VIDEO_WITH_ID = 103;
     private static final int REVIEWS_WITH_ID = 104;
@@ -53,14 +51,6 @@ public class MovieProvider extends ContentProvider {
                 break;
             case MOVIE_FAVORITES:
                 returnCursor = db.query(MovieEntry.TABLE_NAME,projection,selection,selectArgs,null,null,sort);
-                break;
-            case MOVIE_SORT_POPULARITY:
-                returnCursor = db.query(MovieEntry.TABLE_NAME,
-                        projection,selection,selectArgs,null,null,sort);
-                break;
-            case MOVIE_SORT_VOTE:
-                returnCursor = db.query(MovieEntry.TABLE_NAME,
-                        projection,selection,selectArgs,null,null,sort);
                 break;
             case VIDEO_WITH_ID:
                 returnCursor = db.query(MovieVideos.TABLE_NAME,
@@ -195,8 +185,6 @@ public class MovieProvider extends ContentProvider {
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieContract.CONTENT_AUTHORITY;
-        matcher.addURI(authority, MovieContract.PATH_MOVIES+"/popularity",MOVIE_SORT_POPULARITY);
-        matcher.addURI(authority, MovieContract.PATH_MOVIES+"/vote_average",MOVIE_SORT_VOTE);
         matcher.addURI(authority, MovieContract.PATH_MOVIES+"/favorites",MOVIE_FAVORITES);
         matcher.addURI(authority, MovieContract.PATH_VIDEOS+"/*",VIDEO_WITH_ID);
         matcher.addURI(authority, MovieContract.PATH_MOVIES+"/*",MOVIE_WITH_ID);

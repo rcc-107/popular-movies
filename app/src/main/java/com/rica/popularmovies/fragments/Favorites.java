@@ -109,11 +109,19 @@ public class Favorites extends Fragment implements LoaderManager.LoaderCallbacks
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String sort = sp.getString(getString(R.string.pref_sort_key), MovieEntry.POPULARITY)+" Desc";
+        String sort = sp.getString(getString(R.string.pref_sort_key), MovieEntry.RELEASE_DATE);
         Uri moviesUri = MovieEntry.buildMovieUriWithFavorites();
         String selection = MovieEntry.FAVORITES + " = ? ";
         String[] selectionArgs = {"1"};
-        return new CursorLoader(getContext(),moviesUri,Movie_Colums,selection,selectionArgs,sort);
+        String sortOrder;
+        if(getString(R.string.popularity)==sort) {
+            sortOrder = MovieEntry.POPULARITY+" DESC";
+        }else if(getString(R.string.vote)==sort){
+            sortOrder = MovieEntry.VOTE_AVERAGE+" DESC";
+        }else{
+            sortOrder = MovieEntry.RELEASE_DATE+" DESC";
+        }
+        return new CursorLoader(getContext(),moviesUri,Movie_Colums,selection,selectionArgs,sortOrder);
     }
 
     @Override
